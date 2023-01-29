@@ -1,0 +1,17 @@
+{
+	"name": "qpatcher",
+	"description": "TETR.IO Quartet patcher",
+	"homepage": "https://github.com/dzshn/quartet",
+	"authors": ["Sofia Lima <me@dzshn.xyz>"],
+	"copyright": "Copyright (c) 2023 Sofia Lima",
+	"license": "MIT",
+
+	"targetType": "executable",
+
+	"configurations": [
+		{
+			"name": "cli",
+			"mainSourceFile": "source/cli.d"
+		}
+	]
+}

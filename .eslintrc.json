@@ -1,0 +1,45 @@
+{
+    "root": true,
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["svelte3", "@typescript-eslint"],
+    "globals": {
+        "QUARTET_VERSION": "readonly"
+    },
+    "overrides": [
+        {
+            "files": ["*.svelte"],
+            "processor": "svelte3/svelte3",
+            "globals": {
+                "HTMLElement": "readonly"
+            }
+        }
+    ],
+    "settings": {
+        "svelte3/typescript": true
+    },
+    "rules": {
+        "no-duplicate-imports": ["error"],
+        "no-self-compare": ["error"],
+
+        "arrow-body-style": ["error", "as-needed"],
+        "dot-notation": ["error"],
+        "eqeqeq": ["error", "always", { "null": "ignore" }],
+        "no-var": ["error"],
+        "prefer-const": ["error"],
+
+        "array-bracket-spacing": ["error"],
+        "comma-spacing": ["error"],
+        "eol-last": ["error", "always"],
+        "indent": ["error", 4],
+        "no-trailing-spaces": ["error"],
+        "object-curly-spacing": ["error", "always"],
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        "semi": ["error", "always"],
+
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/ban-ts-comment": "off"
+    }
+}

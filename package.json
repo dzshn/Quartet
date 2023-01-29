@@ -1,0 +1,40 @@
+{
+    "name": "quartet",
+    "version": "0.1.0",
+    "description": "Cute TETR.IO client mod",
+    "keywords": [],
+    "homepage": "https://github.com/dzshn/quartet",
+    "bugs": {
+        "url": "https://github.com/dzshn/quartet/issues"
+    },
+    "license": "MIT",
+    "author": "dzshn",
+    "funding": [
+        "https://github.com/sponsors/dzshn",
+        "https://ko-fi.com/dzshn"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/quartet"
+    },
+    "scripts": {
+        "lint": "eslint src --ext .js,.ts,.svelte",
+        "fix": "eslint --fix",
+        "build": "node scripts/build.mjs"
+    },
+    "private": true,
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.49.0",
+        "@typescript-eslint/parser": "^5.49.0",
+        "esbuild": "^0.17.5",
+        "eslint": "^8.32.0",
+        "eslint-plugin-svelte3": "^4.0.0",
+        "pixi.js": "^7.1.1",
+        "svelte": "^3.55.1",
+        "svelte-preprocess": "^5.0.1",
+        "typescript": "^4.9.4"
+    },
+    "dependencies": {
+        "standalone-electron-types": "^1.0.0"
+    }
+}
