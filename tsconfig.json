@@ -14,7 +14,10 @@
 
         "baseUrl": "./src/",
         "paths": {
+            "@api": ["./api"],
+            "@api/*": ["./api/*"],
             "@components/*": ["./components/*"],
+            "@patcher": ["./patcher"],
         }
     }
 }
