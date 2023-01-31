@@ -20,7 +20,11 @@ export default {
         {
             match: /(const \w+=)(\{tetrio:\{id:)/,
             replace: "$1Quartet.GrabbedObjects.assets=$2",
-        }
+        },
+        {
+            match: /,(\w+)=(\{home:\{starter:)/,
+            replace: ";const $1=Quartet.GrabbedObjects.layout=$2",
+        },
     ],
     components: [
         { component: QuartetConfig, target: "after", at: "#config_electron" },

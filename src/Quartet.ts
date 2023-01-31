@@ -34,6 +34,16 @@ export const GrabbedObjects = {} as {
         onexit?: () => void,
         onreenter?: () => void,
     }>,
+    layout: Record<string, {
+        starter: string,
+        back: string,
+        items: Record<string, {
+            up?: string,
+            down?: string,
+            left?: string,
+            right?: string,
+        }>,
+    }>,
     assets: Record<string, {
         id: string,
         name: string,

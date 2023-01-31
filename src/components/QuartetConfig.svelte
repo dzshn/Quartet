@@ -7,6 +7,19 @@
         back: "config",
     };
 
+    GrabbedObjects.layout.config_quartet = {
+        starter: "f!.rg_target_pri",
+        back: "#back",
+        items: {
+            ".rg_target_pri": {
+                up: "p!.rg_target_pri",
+                down: "n!.rg_target_pri",
+                left: "p!.rg_target_pri",
+                right: "n!.rg_target_pri",
+            }
+        },
+    };
+
     function handleClick() {
         GrabbedObjects.transitionTo("config_quartet");
     }
