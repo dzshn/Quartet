@@ -2,8 +2,8 @@
     import { GrabbedObjects } from "Quartet";
 
     GrabbedObjects.menus.config_quartet = {
-        header: 'CONFIG / QUARTET',
-        footer: 'change Quartet settings',
+        header: "CONFIG / QUARTET",
+        footer: "change Quartet settings",
         back: "config",
     };
 

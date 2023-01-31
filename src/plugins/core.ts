@@ -1,10 +1,7 @@
 import QuartetConfig from "@components/QuartetConfig.svelte";
 import QuartetConfigMenu from "@components/QuartetConfigMenu.svelte";
 import type { Plugin } from "@patcher";
-
-export const Devs = {
-    dzshn: { name: "dzshn" },
-};
+import { Devs } from "@api/constants";
 
 export default {
     name: "Core",
