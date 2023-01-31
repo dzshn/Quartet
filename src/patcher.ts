@@ -4,6 +4,8 @@ import type { ComponentType } from "svelte";
 
 import plugins from "~plugins";
 
+export { default as plugins } from "~plugins";
+
 export const bootstrapDone = new Promise<void>(r => resolveBootstrap = r);
 
 let resolveBootstrap: () => void;
