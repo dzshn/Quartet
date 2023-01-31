@@ -11,7 +11,7 @@ export default {
     patches: [
         {
             match: /function (\w+)\(\w+,\w+\)\{.{1,100}\[data-menuview\].{1,1000}\.bindGuide\(.{1,50}\|\|\{\}\)\}/,
-            replace: "$&Quartet.GrabbedObjects.transitionTo=$1;",
+            replace: "$&Quartet.GrabbedObjects.transitionTo=$1;"
         },
         {
             match: /(const \w+=)(\{none:\{back:null)/,
@@ -19,11 +19,11 @@ export default {
         },
         {
             match: /(const \w+=)(\{tetrio:\{id:)/,
-            replace: "$1Quartet.GrabbedObjects.assets=$2",
+            replace: "$1Quartet.GrabbedObjects.assets=$2"
         },
         {
             match: /,(\w+)=(\{home:\{starter:)/,
-            replace: ";const $1=Quartet.GrabbedObjects.layout=$2",
+            replace: ";const $1=Quartet.GrabbedObjects.layout=$2"
         },
     ],
     components: [

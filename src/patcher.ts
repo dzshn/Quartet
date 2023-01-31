@@ -44,7 +44,7 @@ export interface Plugin {
 // TETR.IO is launched from /bootstrap.js, which makes a XHR to /js/tetrio.js and evals it
 // We intercept that by temporarily replacing window.eval (lol)
 const originalEval = window.eval;
-window.eval = (x) => {
+window.eval = x => {
     window.eval = originalEval; // only do this once
     originalEval.call(undefined, applyPatches(x));
     resolveBootstrap();

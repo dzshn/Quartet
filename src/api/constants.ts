@@ -5,5 +5,5 @@ export const Devs: Record<string, PluginAuthor> = {
         name: "dzshn",
         url: "https://dzshn.xyz/",
         github: "dzshn",
-    }
+    },
 };

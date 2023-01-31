@@ -12,7 +12,7 @@ const defaults = {
 
 const settings = (() => {
     try {
-        return Object.assign(defaults, JSON.parse(localStorage.getItem("quartetConfig") || ""));
+        return { ...defaults, ...JSON.parse(localStorage.getItem("quartetConfig") || "") };
     } catch {
         return defaults;
     }
@@ -32,7 +32,7 @@ function makeProxy<T extends object>(settings: T): T {
             target[prop] = value;
             localStorage.setItem("quartetConfig", JSON.stringify(settings));
             return true;
-        }
+        },
     });
 }
 
