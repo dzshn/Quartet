@@ -1,8 +1,8 @@
-import type { ComponentType } from "svelte";
-import plugins from "~plugins";
-
 import { Log } from "@api";
 import { Settings } from "@api/settings";
+import type { ComponentType } from "svelte";
+
+import plugins from "~plugins";
 
 export const bootstrapDone = new Promise<void>(r => resolveBootstrap = r);
 
@@ -50,7 +50,7 @@ window.eval = (x) => {
     resolveBootstrap();
 };
 
-export function hookComponent(component: ComponentType, target: HookTarget, at: string): InstanceType<ComponentType> {
+export function hookComponent(component: ComponentType, target: HookTarget, at: string) {
     const query = document.querySelector(at);
     if (!query)
         throw new Error("query failed");
@@ -92,7 +92,7 @@ function applyPatches(src: string): string {
 
             const newSrc = src.replace(patch.match, patch.replace);
             if (src === newSrc)
-                Log.warn("Patcher", `Patch for ${plugin.name} failed! ${patch.match} -> ${patch.replace}`);
+                Log.warn("Patcher", `Patch for ${plugin.name} had no effect! ${patch.match} -> ${patch.replace}`);
 
             src = newSrc;
         }
