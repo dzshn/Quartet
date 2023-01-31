@@ -1,16 +1,25 @@
+import { execSync } from "node:child_process";
+import { readdir, readFile } from "node:fs/promises";
 import process from "node:process";
+
 import esbuild from "esbuild";
 import * as svelte from "svelte/compiler";
 import sveltePreprocess from "svelte-preprocess";
-import { readFile, readdir } from "node:fs/promises";
-import { execSync } from "node:child_process";
 
 const watch = process.argv.includes("--watch");
 const gitHash = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
 
 const sveltePreprocessor = sveltePreprocess({
-    typescript({ content }) {
-        return esbuild.transformSync(content, { loader: "ts" });
+    async typescript({ content }) {
+        return esbuild.transform(content, {
+            loader: "ts",
+            tsconfigRaw: {
+                compilerOptions: {
+                    importsNotUsedAsValues: "preserve",
+                    preserveValueImports: true
+                }
+            }
+        });
     }
 });
 
@@ -30,7 +39,7 @@ const esbuildOpts = {
         {
             name: "svelte",
             setup(build) {
-                build.onLoad({ filter: /\.svelte$/ }, async (args) => {
+                build.onLoad({ filter: /\.svelte$/ }, async args => {
                     const src = await readFile(args.path, "utf-8");
 
                     let contents = (await svelte.preprocess(src, sveltePreprocessor)).code;
@@ -43,10 +52,10 @@ const esbuildOpts = {
         {
             name: "plugins",
             setup(build) {
-                build.onResolve({ filter: /^~plugins$/ }, (args) => ({
+                build.onResolve({ filter: /^~plugins$/ }, args => ({
                     namespace: "all-plugins", path: args.path
                 }));
-                build.onLoad({ filter: /^~plugins$/, namespace: "all-plugins" }, async (args) => {
+                build.onLoad({ filter: /^~plugins$/, namespace: "all-plugins" }, async () => {
                     let contents = "const p = []; export default p;\n";
                     for (const file of await readdir("./src/plugins")) {
                         const mod = file.replace(/.(js|ts|svelte)$/, "");
@@ -103,7 +112,7 @@ if (watch) {
         if (!metafile) throw "fish";
         simplifyInputs(metafile);
         Object.values(metafile.outputs).forEach(simplifyInputs);
-        console.log(await esbuild.analyzeMetafile(metafile))
+        console.log(await esbuild.analyzeMetafile(metafile));
         await ctx.dispose();
     }
 }
