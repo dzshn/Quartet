@@ -34,8 +34,8 @@ const esbuildOpts: esbuild.BuildOptions = {
     platform: "node",
     target: ["chrome83"],
     external: ["electron"],
-    sourcemap: watch ? "inline" : "external",
-    legalComments: "linked",
+    sourcemap: "external",
+    legalComments: "none",
     plugins: [
         {
             name: "svelte",
@@ -73,8 +73,35 @@ const esbuildOpts: esbuild.BuildOptions = {
     define: {
         QUARTET_VERSION: JSON.stringify(version),
         QUARTET_DEV: JSON.stringify(watch),
-    }
+    },
+    banner: {
+        js: dedent(`\
+            /**
+             * Quartet, a cute and minimal client mod for TETR.IO
+             *
+             * @author dzshn (https://dzshn.xyz)
+             * @license GPL-3.0
+             * @version ${version}
+             *
+             * @see {@link https://github.com/dzshn/Quartet}
+             */
+        `),
+    },
 };
+
+function dedent(text: string) {
+    const lines = text.split("\n");
+    let commonWhitespace = "";
+    for (const line of lines) {
+        const whitespace = line.replace(line.trimStart(), "");
+        if (line === whitespace)
+            continue;
+        if (!commonWhitespace || whitespace.length < commonWhitespace.length) {
+            commonWhitespace = whitespace;
+        }
+    }
+    return lines.map(line => line.replace(commonWhitespace, "")).join("\n");
+}
 
 function simplifyInputs(obj: esbuild.Metafile | esbuild.Metafile["outputs"][string]) {
     // Make analysis a bit easier to read by shortening node_modules paths:
@@ -99,7 +126,7 @@ async function main () {
                 window: "unsafeWindow",
             },
             banner: {
-                js: `\
+                js: dedent(`\
                     // ==UserScript==
                     // @name         Quartet
                     // @description  A cute and minimal TETR.IO client mod
@@ -110,9 +137,11 @@ async function main () {
                     // @match        *://tetr.io/*
                     // @run-at       document-start
                     // ==/UserScript==
-                `.split("\n").map(x => x.trimStart()).join("\n"),
+                `),
             },
-            footer: { js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})" }
+            footer: {
+                js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet"
+            }
         });
 
         contexts.push(userscriptCtx);
@@ -122,12 +151,14 @@ async function main () {
         ...esbuildOpts,
         entryPoints: ["src/loader.ts"],
         outfile: "dist/loader.js",
+        footer: { js: "//# sourceURL=QuartetLoader" },
     });
 
     const preloadCtx = await esbuild.context({
         ...esbuildOpts,
         entryPoints: ["src/preload.ts"],
         outfile: "dist/preload.js",
+        footer: { js: "//# sourceURL=QuartetPreload" },
     });
 
     const quartetCtx = await esbuild.context({
@@ -136,6 +167,7 @@ async function main () {
         outfile: "dist/quartet.js",
         format: "iife",
         globalName: "Quartet",
+        footer: { js: "//# sourceURL=Quartet" },
     });
 
     contexts.push(loaderCtx, preloadCtx, quartetCtx);
