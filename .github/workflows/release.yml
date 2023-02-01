@@ -31,6 +31,9 @@ jobs:
             - name: Build everything
               run: pnpm build --web
 
+            - name: Clean irrelevant files
+              run: rm dist/*.map dist/*.map
+
             - name: Set release tag
               run: |
                   echo "release_tag=$(jq .version package.json -r) ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
