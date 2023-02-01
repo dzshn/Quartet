@@ -1,0 +1,45 @@
+name: Build and upload dev release
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - .github/workflows/release.yml
+            - src/**
+            - scripts/**
+            - package.json
+            - pnpm-lock.yaml
+
+permissions:
+    contents: write
+
+jobs:
+    build-node:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: pnpm/action-setup@v2
+
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: "pnpm"
+
+            - name: Install project
+              run: pnpm install
+
+            - name: Build everything
+              run: pnpm build --web
+
+            - name: Set release tag
+              run: |
+                  echo "release_tag=$(jq .version package.json -r) ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
+
+            - name: Upload dev release
+              run: |
+                  gh release upload devbuild --clobber dist/*
+                  gh release edit devbuild --title "Quartet INDEV $RELEASE_TAG"
+              env:
+                  RELEASE_TAG: ${{ env.release_tag }}

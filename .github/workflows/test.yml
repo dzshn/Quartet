@@ -1,0 +1,46 @@
+name: Test and build Quartet
+
+on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+
+jobs:
+    test-node:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+
+          - uses: pnpm/action-setup@v2
+            with:
+                version: ^7
+
+          - uses: actions/setup-node@v3
+            with:
+                node-version: 18
+                cache: "pnpm"
+
+          - name: Install project
+            run: pnpm install
+
+          - name: Lint using ESLint
+            run: pnpm lint
+
+          - name: Check for TypeScript errors
+            run: pnpm tsc --noEmit
+
+          - name: Build everything
+            run: pnpm build --web
+
+    test-d:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/Check@v3
+
+            - uses: dlang-community/setup-dlang@v1
+              with:
+                  compiler: ldc              
+
+            - name: Build qpatcher
+              run: cd patcher && dub build -b release
