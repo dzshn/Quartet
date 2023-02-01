@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Settings, SettingType } from "@api/settings";
+    import { GrabbedObjects } from "Quartet";
 
     import plugins from "~plugins";
 </script>
@@ -13,13 +14,21 @@
         {@const settings = Settings.plugins[plugin.name]}
 
         <div class="scroller_block">
-            <h2 class="ns">{plugin.name}</h2>
+            <h2 class="ns">{plugin.name.toUpperCase()}</h2>
             <p class="sub ns">{plugin.description}</p>
             <div
                 class="checkbox ns rg_target_pri"
                 class:checked={settings.enabled}
                 class:disabled={plugin.required}
-                on:click={() => Settings.plugins[plugin.name].enabled = !settings.enabled}
+                on:click={() => {
+                    Settings.plugins[plugin.name].enabled = !settings.enabled;
+                    if (plugin.patches?.length)
+                        GrabbedObjects.showNotification({
+                            msg: `${settings.enabled ? "enabling" : "disabling"} ${plugin.name.toUpperCase()} requires a restart to fully apply. hit F5 to restart!`,
+                            icon: "warning",
+                            color: "#fb84bc",
+                        });
+                }}
             >
                 enable this plugin
             </div>
@@ -46,7 +55,7 @@
                         <input
                             placeholder={def.placeholder}
                             autocomplete="off"
-                            class="config_input rg_target_pri" 
+                            class="config_input rg_target_pri"
                             bind:value={Settings.plugins[plugin.name][key]}
                         />
                     </div>
