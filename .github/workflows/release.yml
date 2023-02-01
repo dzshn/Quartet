@@ -32,7 +32,7 @@ jobs:
               run: pnpm build --web
 
             - name: Clean irrelevant files
-              run: rm dist/*.map dist/*.txt
+              run: rm -f dist/*.map dist/*.txt
 
             - name: Set release tag
               run: |

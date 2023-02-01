@@ -39,7 +39,7 @@ jobs:
 
             - uses: dlang-community/setup-dlang@v1
               with:
-                  compiler: ldc              
+                  compiler: ldc-latest
 
             - name: Build qpatcher
               run: cd patcher && dub build -b release
