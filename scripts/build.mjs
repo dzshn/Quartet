@@ -95,7 +95,7 @@ if (web) {
                 // ==UserScript==
                 // @name         Quartet
                 // @description  A cute and minimal TETR.IO client mod
-                // @version      0.1.0 (23e89b4)
+                // @version      ${version}
                 // @author       dzshn (https://dzshn.xyz)
                 // @license      GPL-3.0
                 // @donate       https://ko-fi.com/dzshn
