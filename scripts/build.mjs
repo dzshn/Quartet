@@ -7,7 +7,9 @@ import * as svelte from "svelte/compiler";
 import sveltePreprocess from "svelte-preprocess";
 
 const watch = process.argv.includes("--watch");
+const web = process.argv.includes("--web");
 const gitHash = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
+const version = `${process.env.npm_package_version} (${gitHash})`;
 
 const sveltePreprocessor = sveltePreprocess({
     async typescript({ content }) {
@@ -70,9 +72,43 @@ const esbuildOpts = {
         }
     ],
     define: {
-        QUARTET_VERSION: JSON.stringify(`${process.env.npm_package_version} (${gitHash})`),
+        QUARTET_VERSION: JSON.stringify(version),
+        QUARTET_DEV: JSON.stringify(watch),
     }
 };
+
+const contexts = [];
+
+if (web) {
+    const userscriptCtx = await esbuild.context({
+        ...esbuildOpts,
+        entryPoints: ["src/Quartet.ts"],
+        outfile: "dist/Quartet.user.js",
+        format: "iife",
+        globalName: "Quartet",
+        define: {
+            ...esbuildOpts.define,
+            window: "unsafeWindow",
+        },
+        banner: {
+            js: `\
+                // ==UserScript==
+                // @name         Quartet
+                // @description  A cute and minimal TETR.IO client mod
+                // @version      0.1.0 (23e89b4)
+                // @author       dzshn (https://dzshn.xyz)
+                // @license      GPL-3.0
+                // @donate       https://ko-fi.com/dzshn
+                // @match        *://tetr.io/*
+                // @run-at       document-start
+                // ==/UserScript==
+            `.split("\n").map(x => x.trimStart()).join("\n"),
+        },
+        footer: { js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})" }
+    });
+
+    contexts.push(userscriptCtx);
+}
 
 const loaderCtx = await esbuild.context({
     ...esbuildOpts,
@@ -94,7 +130,7 @@ const quartetCtx = await esbuild.context({
     globalName: "Quartet",
 });
 
-const contexts = [loaderCtx, preloadCtx, quartetCtx];
+contexts.push(loaderCtx, preloadCtx, quartetCtx);
 
 function simplifyInputs(obj) {
     // Make analysis a bit easier to read by shortening node_modules paths:
