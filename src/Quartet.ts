@@ -45,7 +45,7 @@ interface Notification {
     fgcolor?: string;
     classes?: string[];
     suppressable?: boolean;
-    buttons?: { label: string; icon?: string; onclick: () => void; }[];
+    buttons?: NotificationButton[];
     timeout?: number;
     onclick?: NotificationAction;
 }
