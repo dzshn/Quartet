@@ -19,18 +19,13 @@
             }
         },
     };
-
-    function handleClick() {
-        GrabbedObjects.transitionTo("config_quartet");
-    }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events --->
 <div
     class="scroller_item scroller_item_config has_description ns rg_target_pri"
     data-hover="hover"
     data-hit="hit2"
-    on:click={handleClick}
+    on:click={() => GrabbedObjects.transitionTo("config_quartet")}
 >
     <h1>Quartet</h1>
     <p>change settings for Quartet</p>

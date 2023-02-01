@@ -25,7 +25,10 @@ module.exports = {
         "svelte3/ignore-warnings": (
             /** @param {import("svelte/types/compiler/interfaces").Warning} w */
             ({ code, message }) => (
-                code === "missing-declaration" && Object.keys(globals).some(g => message.startsWith(`'${g}'`))
+                code === "missing-declaration"
+                    && Object.keys(globals).some(g => message.startsWith(`'${g}'`))
+                // TETR.IO already handles key events for all elements, so not an issue.
+                || code === "a11y-click-events-have-key-events"
             )
         ),
     },

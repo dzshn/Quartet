@@ -1,6 +1,4 @@
-import type { PluginAuthor } from "@patcher";
-
-export const Devs: Record<string, PluginAuthor> = {
+export const Devs = {
     dzshn: {
         name: "dzshn",
         url: "https://dzshn.xyz/",

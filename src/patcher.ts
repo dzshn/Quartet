@@ -1,10 +1,10 @@
 import { Log } from "@api";
-import { Settings } from "@api/settings";
+import { DefinedSettings, Settings } from "@api/settings";
 import type { ComponentType } from "svelte";
 
 import plugins from "~plugins";
 
-export { default as plugins } from "~plugins";
+export const Plugins = Object.fromEntries(plugins.map(p => [p.name, p]));
 
 export const bootstrapDone = new Promise<void>(r => resolveBootstrap = r);
 
@@ -37,10 +37,11 @@ export interface Plugin {
     description: string;
     authors: PluginAuthor[];
     required?: boolean;
-    patches: Patch[];
-    components: ComponentHook[];
+    patches?: Patch[];
+    components?: ComponentHook[];
     start?: () => void;
     stop?: () => void;
+    settings?: DefinedSettings;
 }
 
 // TETR.IO is launched from /bootstrap.js, which makes a XHR to /js/tetrio.js and evals it
@@ -76,19 +77,29 @@ export function hookComponent(component: ComponentType, target: HookTarget, at: 
     throw new Error("invalid target");
 }
 
+function initialiseSettings(plugin: Plugin) {
+    Settings.plugins[plugin.name] ??= { enabled: !!plugin.required };
+    if (!plugin.settings)
+        return;
+
+    plugin.settings.pluginName = plugin.name;
+    for (const [key, def] of Object.entries(plugin.settings.def)) {
+        if ("default" in def)
+            Settings.plugins[plugin.name][key] = def.default;
+    }
+}
+
 function applyPatches(src: string): string {
     Log.log("Patcher", "Applying all patches now!");
     for (const plugin of plugins) {
-        if (Settings.plugins[plugin.name] == null)
-            Settings.plugins[plugin.name] = { enabled: !!plugin.required };
-
+        initialiseSettings(plugin);
         if (!Settings.plugins[plugin.name].enabled)
             continue;
 
-        if (plugin.patches.length)
+        if (plugin.patches?.length)
             Log.log("Patcher", "Applying patches from", plugin.name);
 
-        for (const patch of plugin.patches) {
+        for (const patch of plugin.patches || []) {
             if (patch.predicate && !patch.predicate())
                 continue;
 
@@ -109,15 +120,27 @@ bootstrapDone.then(() => {
         if (!plugin.required && !Settings.plugins[plugin.name].enabled)
             continue;
 
-        if (plugin.components.length)
+        if (plugin.components?.length)
             Log.log("Patcher", "Hooking up components from", plugin.name);
 
-        for (const { component, target, at } of plugin.components) {
+        for (const { component, target, at } of plugin.components || []) {
             try {
                 hookComponent(component, target, at);
             } catch (err) {
                 Log.warn("Patcher", `Hooking compoment for ${plugin.name} failed! ${err}`);
             }
         }
+    }
+
+    Log.log("Patcher", "Starting up all plugins now!");
+    for (const plugin of plugins) {
+        if (!plugin.required && !Settings.plugins[plugin.name].enabled)
+            continue;
+
+        if (!plugin.start)
+            continue;
+
+        Log.log("Patcher", "Starting", plugin.name);
+        plugin.start();
     }
 });
