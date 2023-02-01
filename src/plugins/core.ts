@@ -10,8 +10,8 @@ export default {
     required: true,
     patches: [
         {
-            match: /function (\w+)\(\w+,\w+\)\{.{1,100}\[data-menuview\].{1,1000}\.bindGuide\(.{1,50}\|\|\{\}\)\}/,
-            replace: "$&Quartet.GrabbedObjects.transitionTo=$1;"
+            match: /function (\w+)\(\w+,\w+\)\{.{1,100}\[data-menuview\]/,
+            replace: "Quartet.GrabbedObjects.transitionTo=$1;$&"
         },
         {
             match: /(const \w+=)(\{none:\{back:null)/,
@@ -28,6 +28,10 @@ export default {
         {
             match: /(const \w+=)(function\(\)\{const \w+=\{sfx:\{state:)/,
             replace: "$1Quartet.GrabbedObjects.Loader=$2"
+        },
+        {
+            match: /function (\w+)\(\w+\)\{.{1,100}\.suppressable&&/,
+            replace: "Quartet.GrabbedObjects.showNotification=$1;$&",
         }
     ],
     components: [

@@ -26,8 +26,34 @@ type TextureName = "i" | "j" | "l" | "o" | "s" | "t" | "z" | "d" | "gb" | "gbd";
 
 type ResourceType = "sfx" | "fonts" | "textures" | "feecof" | "homebanner" | "environment";
 
+type NotificationAction = (removeNotification: () => void) => void;
+
+interface NotificationButton {
+    label: string;
+    icon?: string;
+    onclick: NotificationAction;
+}
+
+interface Notification {
+    msg: string;
+    header?: string;
+    icon?: string; // May be any url, but defaults to /res/icon/{icon}.svg
+    subicon?: string;
+    color?: string;
+    subcolor?: string;
+    bgcolor?: string;
+    fgcolor?: string;
+    classes?: string[];
+    suppressable?: boolean;
+    buttons?: { label: string; icon?: string; onclick: () => void; }[];
+    timeout?: number;
+    onclick?: NotificationAction;
+}
+
 export const GrabbedObjects = {} as {
-    transitionTo: (menuId: string, /* no idea yet */ _?: boolean) => void,
+    transitionTo: (menuId: string, /* no idea yet */ _?: boolean) => void;
+    /** Displays a notification on the bottom-left. Returns the element it created for it. */
+    showNotification: (notification: Notification) => HTMLDivElement;
     menus: Record<string, {
         header: string;
         footer: string;
