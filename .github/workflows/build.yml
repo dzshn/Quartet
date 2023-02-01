@@ -31,7 +31,7 @@ jobs:
               run: pnpm tsc --noEmit
 
     build:
-        if: ${{ github.event == 'push' }}
+        if: ${{ github.event_name == 'push' }}
         needs: test
         runs-on: ubuntu-latest
         steps:
