@@ -25,6 +25,10 @@ export default {
             match: /,(\w+)=(\{home:\{starter:)/,
             replace: ";const $1=Quartet.GrabbedObjects.layout=$2"
         },
+        {
+            match: /(const \w+=)(function\(\)\{const \w+=\{sfx:\{state:)/,
+            replace: "$1Quartet.GrabbedObjects.Loader=$2"
+        }
     ],
     components: [
         { component: QuartetConfig, target: "after", at: "#config_electron" },

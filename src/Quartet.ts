@@ -24,37 +24,55 @@ export * as Patcher from "@patcher";
 
 type TextureName = "i" | "j" | "l" | "o" | "s" | "t" | "z" | "d" | "gb" | "gbd";
 
+type ResourceType = "sfx" | "fonts" | "textures" | "feecof" | "homebanner" | "environment";
+
 export const GrabbedObjects = {} as {
     transitionTo: (menuId: string, /* no idea yet */ _?: boolean) => void,
     menus: Record<string, {
-        header: string,
-        footer: string,
-        back: string | null,
-        onenter?: () => void,
-        onexit?: () => void,
-        onreenter?: () => void,
-    }>,
+        header: string;
+        footer: string;
+        back: string | null;
+        onenter?: () => void;
+        onexit?: () => void;
+        onreenter?: () => void;
+    }>;
     layout: Record<string, {
-        starter: string,
-        back: string,
+        starter: string;
+        back: string;
         items: Record<string, {
-            up?: string,
-            down?: string,
-            left?: string,
-            right?: string,
-        }>,
-    }>,
+            up?: string;
+            down?: string;
+            left?: string;
+            right?: string;
+        }>;
+    }>;
     assets: Record<string, {
-        id: string,
-        name: string,
+        id: string;
+        name: string;
         format: "simple" | "connected",
         assets: Record<string, Record<"hd" | "uhd", {
-            url: string,
-            loaded: boolean,
-            loading: boolean,
-            baseTexture?: BaseTexture,
-            textures: Record<string, unknown>,
-        }>>,
-        colors: Record<"base" | "glow", Record<TextureName, number>>,
-    }>
+            url: string;
+            loaded: boolean;
+            loading: boolean;
+            baseTexture?: BaseTexture;
+            textures: Record<string, unknown>;
+        }>>;
+        colors: Record<"base" | "glow", Record<TextureName, number>>;
+    }>;
+    Loader: {
+        /** Adds a callback that will be called once everything is loaded (and after login) */
+        ready: (cb: (_: unknown) => void) => void;
+        /** Sets everything as loaded. Calls all ready callbacks. */
+        finish: () => void;
+        /** Goes back to loading screen. */
+        unready: () => void;
+        /** Sets the state of a resource to a message (shown on bottom right on load screen) */
+        setState: (resource: ResourceType, state: string) => void;
+        /** Unsets the state of a resource, meaning it loaded. */
+        finishLoad: (resource: ResourceType) => void;
+        /** Force-updates the game. If silent, a notification will not be shown. */
+        update: (silent: boolean) => void;
+        /** Set from bootstrap.js(?), this returns the SHA-1 sum of tetrio.js */
+        i: () => string;
+    }
 };

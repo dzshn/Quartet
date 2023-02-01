@@ -31,7 +31,7 @@ const esbuildOpts = {
     minify: !watch,
     bundle: true,
     platform: "node",
-    target: ["ESNext"],
+    target: ["chrome83"],
     external: ["electron"],
     sourcemap: watch ? "inline" : "external",
     legalComments: "linked",
