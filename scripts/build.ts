@@ -26,8 +26,7 @@ const sveltePreprocessor = sveltePreprocess({
 });
 
 
-/** @type {import("esbuild").BuildOptions} */
-const esbuildOpts = {
+const esbuildOpts: esbuild.BuildOptions = {
     logLevel: "info",
     metafile: true,
     minify: !watch,
@@ -77,62 +76,7 @@ const esbuildOpts = {
     }
 };
 
-const contexts = [];
-
-if (web) {
-    const userscriptCtx = await esbuild.context({
-        ...esbuildOpts,
-        entryPoints: ["src/Quartet.ts"],
-        outfile: "dist/Quartet.user.js",
-        format: "iife",
-        globalName: "Quartet",
-        define: {
-            ...esbuildOpts.define,
-            window: "unsafeWindow",
-        },
-        banner: {
-            js: `\
-                // ==UserScript==
-                // @name         Quartet
-                // @description  A cute and minimal TETR.IO client mod
-                // @version      ${version}
-                // @author       dzshn (https://dzshn.xyz)
-                // @license      GPL-3.0
-                // @donate       https://ko-fi.com/dzshn
-                // @match        *://tetr.io/*
-                // @run-at       document-start
-                // ==/UserScript==
-            `.split("\n").map(x => x.trimStart()).join("\n"),
-        },
-        footer: { js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})" }
-    });
-
-    contexts.push(userscriptCtx);
-}
-
-const loaderCtx = await esbuild.context({
-    ...esbuildOpts,
-    entryPoints: ["src/loader.ts"],
-    outfile: "dist/loader.js",
-});
-
-const preloadCtx = await esbuild.context({
-    ...esbuildOpts,
-    entryPoints: ["src/preload.ts"],
-    outfile: "dist/preload.js",
-});
-
-const quartetCtx = await esbuild.context({
-    ...esbuildOpts,
-    entryPoints: ["src/Quartet.ts"],
-    outfile: "dist/quartet.js",
-    format: "iife",
-    globalName: "Quartet",
-});
-
-contexts.push(loaderCtx, preloadCtx, quartetCtx);
-
-function simplifyInputs(obj) {
+function simplifyInputs(obj: esbuild.Metafile | esbuild.Metafile["outputs"][string]) {
     // Make analysis a bit easier to read by shortening node_modules paths:
     // node_modules/.pnpm/package@ver/node_modules/package -> package
     obj.inputs = Object.fromEntries(Object.entries(obj.inputs).map(
@@ -140,15 +84,74 @@ function simplifyInputs(obj) {
     ));
 }
 
-if (watch) {
-    contexts.forEach(ctx => ctx.watch());
-} else {
-    for (const ctx of contexts) {
-        const { metafile } = await ctx.rebuild();
-        if (!metafile) throw "fish";
-        simplifyInputs(metafile);
-        Object.values(metafile.outputs).forEach(simplifyInputs);
-        console.log(await esbuild.analyzeMetafile(metafile));
-        await ctx.dispose();
+async function main () {
+    const contexts: esbuild.BuildContext[] = [];
+
+    if (web) {
+        const userscriptCtx = await esbuild.context({
+            ...esbuildOpts,
+            entryPoints: ["src/Quartet.ts"],
+            outfile: "dist/Quartet.user.js",
+            format: "iife",
+            globalName: "Quartet",
+            define: {
+                ...esbuildOpts.define,
+                window: "unsafeWindow",
+            },
+            banner: {
+                js: `\
+                    // ==UserScript==
+                    // @name         Quartet
+                    // @description  A cute and minimal TETR.IO client mod
+                    // @version      ${version}
+                    // @author       dzshn (https://dzshn.xyz)
+                    // @license      GPL-3.0
+                    // @donate       https://ko-fi.com/dzshn
+                    // @match        *://tetr.io/*
+                    // @run-at       document-start
+                    // ==/UserScript==
+                `.split("\n").map(x => x.trimStart()).join("\n"),
+            },
+            footer: { js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})" }
+        });
+
+        contexts.push(userscriptCtx);
+    }
+
+    const loaderCtx = await esbuild.context({
+        ...esbuildOpts,
+        entryPoints: ["src/loader.ts"],
+        outfile: "dist/loader.js",
+    });
+
+    const preloadCtx = await esbuild.context({
+        ...esbuildOpts,
+        entryPoints: ["src/preload.ts"],
+        outfile: "dist/preload.js",
+    });
+
+    const quartetCtx = await esbuild.context({
+        ...esbuildOpts,
+        entryPoints: ["src/Quartet.ts"],
+        outfile: "dist/quartet.js",
+        format: "iife",
+        globalName: "Quartet",
+    });
+
+    contexts.push(loaderCtx, preloadCtx, quartetCtx);
+
+    if (watch) {
+        contexts.forEach(ctx => ctx.watch());
+    } else {
+        for (const ctx of contexts) {
+            const { metafile } = await ctx.rebuild();
+            if (!metafile) throw "fish";
+            simplifyInputs(metafile);
+            Object.values(metafile.outputs).forEach(simplifyInputs);
+            console.log(await esbuild.analyzeMetafile(metafile));
+            await ctx.dispose();
+        }
     }
 }
+
+main();
