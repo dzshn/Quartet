@@ -53,8 +53,8 @@ interface Notification {
 export const GrabbedObjects = {} as {
     transitionTo: (menuId: string, /* no idea yet */ _?: boolean) => void;
     /** Displays a notification on the bottom-left. Returns the element it created for it. */
-    showNotification: (notification: Notification) => HTMLDivElement;
-    menus: Record<string, {
+    showNotification: (notification: Notification | string) => HTMLDivElement;
+    Menus: Record<string, {
         header: string;
         footer: string;
         back: string | null;
@@ -62,7 +62,7 @@ export const GrabbedObjects = {} as {
         onexit?: () => void;
         onreenter?: () => void;
     }>;
-    layout: Record<string, {
+    Layout: Record<string, {
         starter: string;
         back: string;
         items: Record<string, {
@@ -72,7 +72,7 @@ export const GrabbedObjects = {} as {
             right?: string;
         }>;
     }>;
-    assets: Record<string, {
+    Assets: Record<string, {
         id: string;
         name: string;
         format: "simple" | "connected",

@@ -15,15 +15,15 @@ export default {
         },
         {
             match: /(const \w+=)(\{none:\{back:null)/,
-            replace: "$1Quartet.GrabbedObjects.menus=$2"
+            replace: "$1Quartet.GrabbedObjects.Menus=$2"
         },
         {
             match: /(const \w+=)(\{tetrio:\{id:)/,
-            replace: "$1Quartet.GrabbedObjects.assets=$2"
+            replace: "$1Quartet.GrabbedObjects.Assets=$2"
         },
         {
             match: /,(\w+)=(\{home:\{starter:)/,
-            replace: ";const $1=Quartet.GrabbedObjects.layout=$2"
+            replace: ";const $1=Quartet.GrabbedObjects.Layout=$2"
         },
         {
             match: /(const \w+=)(function\(\)\{const \w+=\{sfx:\{state:)/,

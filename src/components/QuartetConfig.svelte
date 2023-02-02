@@ -1,13 +1,13 @@
 <script lang="ts">
     import { GrabbedObjects } from "Quartet";
 
-    GrabbedObjects.menus.config_quartet = {
+    GrabbedObjects.Menus.config_quartet = {
         header: "CONFIG / QUARTET",
         footer: "change Quartet settings",
         back: "config",
     };
 
-    GrabbedObjects.layout.config_quartet = {
+    GrabbedObjects.Layout.config_quartet = {
         starter: "f!.rg_target_pri",
         back: "#back",
         items: {
