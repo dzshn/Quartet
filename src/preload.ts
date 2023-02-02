@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { webFrame } from "electron";
+import { contextBridge, webFrame } from "electron";
 import { readFileSync } from "fs";
 import { join } from "path";
+import QuartetBeryl from "QuartetBeryl";
+
+contextBridge.exposeInMainWorld("QuartetBeryl", QuartetBeryl);
 
 webFrame.executeJavaScript(readFileSync(join(__dirname, "quartet.js"), "utf-8"));
-
-require(process.env.__TETRIO_PRELOAD_PATH!);

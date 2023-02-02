@@ -12,6 +12,7 @@ specifiers:
   standalone-electron-types: ^1.0.0
   svelte: ^3.55.1
   svelte-preprocess: ^5.0.1
+  systeminformation: ^5.17.8
   tsx: ^3.12.2
   typescript: ^4.9.4
 
@@ -29,6 +30,7 @@ devDependencies:
   pixi.js: 7.1.1
   svelte: 3.55.1
   svelte-preprocess: 5.0.1_atrrhq7vg4ekua4nnyrpuardle
+  systeminformation: 5.17.8
   tsx: 3.12.2
   typescript: 4.9.4
 
@@ -1796,6 +1798,13 @@ packages:
   /svelte/3.55.1:
     resolution: {integrity: sha512-S+87/P0Ve67HxKkEV23iCdAh/SX1xiSfjF1HOglno/YTbSTW7RniICMCofWGdJJbdjw3S+0PfFb1JtGfTXE0oQ==}
     engines: {node: '>= 8'}
+    dev: true
+
+  /systeminformation/5.17.8:
+    resolution: {integrity: sha512-kMQsCOFQXqEjoDWKpYkC+ezJImrOnyTL3FZnYDZdWLTZcMW7Gomdp8zH9ztGlSo2L1iCAQXZ8HlV1bI8/Ts64g==}
+    engines: {node: '>=8.0.0'}
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
     dev: true
 
   /text-table/0.2.0:

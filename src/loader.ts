@@ -34,12 +34,13 @@ const tetrioAsarPath = join(require.main!.path, "..", "_app.asar");
 app.setAppPath(tetrioAsarPath);
 
 if (!process.argv.includes("--vanilla")) {
-    process.env.__TETRIO_PRELOAD_PATH = join(tetrioAsarPath, "preload.js");
-
     class BrowserWindow extends electron.BrowserWindow {
         constructor(options?: BrowserWindowConstructorOptions) {
-            if (options?.webPreferences?.preload && options.title)
+            if (options?.webPreferences?.preload && options.title) {
                 options.webPreferences.preload = join(__dirname, "preload.js");
+                // We rewrite preload completely, so we might as well make it safer.
+                options.webPreferences.contextIsolation = true;
+            }
 
             super(options);
         }

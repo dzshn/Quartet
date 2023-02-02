@@ -44,6 +44,18 @@ export interface Plugin {
     settings?: DefinedSettings;
 }
 
+if (!QUARTET_WEB) {
+    // As preload.js is replaced completely, we have to set these manually
+    //@ts-ignore
+    window.IS_ELECTRON = true;
+    //@ts-ignore
+    window.IPC = QuartetBeryl.ipc;
+    //@ts-ignore
+    window.REFRESH_RATE = QuartetBeryl.refreshRate;
+
+    // TETR.IO also sets your motherboard's serial number for fingerprinting. We don't.
+}
+
 // TETR.IO is launched from /bootstrap.js, which makes a XHR to /js/tetrio.js and evals it
 // We intercept that by temporarily replacing window.eval (lol)
 const originalEval = window.eval;

@@ -33,7 +33,7 @@ const esbuildOpts: esbuild.BuildOptions = {
     bundle: true,
     platform: "node",
     target: ["chrome83"],
-    external: ["electron"],
+    external: ["electron", "systeminformation"],
     sourcemap: "external",
     legalComments: "none",
     plugins: [
@@ -73,6 +73,7 @@ const esbuildOpts: esbuild.BuildOptions = {
     define: {
         QUARTET_VERSION: JSON.stringify(version),
         QUARTET_DEV: JSON.stringify(watch),
+        QUARTET_WEB: JSON.stringify(web),
     },
     banner: {
         js: dedent(`\
@@ -129,6 +130,7 @@ async function main () {
                 js: dedent(`\
                     // ==UserScript==
                     // @name         Quartet
+                    // @namespace    https://github.com/dzshn
                     // @description  A cute and minimal TETR.IO client mod
                     // @version      ${version}
                     // @author       dzshn (https://dzshn.xyz)
