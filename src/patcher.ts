@@ -1,6 +1,6 @@
 import { Log } from "@api";
 import { DefinedSettings, Settings } from "@api/settings";
-import type { ComponentType } from "svelte";
+import type { ComponentConstructorOptions, ComponentType } from "svelte";
 
 import plugins from "~plugins";
 
@@ -54,7 +54,9 @@ window.eval = x => {
     resolveBootstrap();
 };
 
-export function hookComponent(component: ComponentType, target: HookTarget, at: string) {
+export function hookComponent<C extends ComponentType>(
+    component: C, target: HookTarget, at: string, props?: ComponentConstructorOptions<C>
+) {
     const query = document.querySelector(at);
     if (!query)
         throw new Error("query failed");
@@ -64,16 +66,31 @@ export function hookComponent(component: ComponentType, target: HookTarget, at: 
         throw new Error("queried object has no parent, but is needed");
 
     if (target === "after")
-        return new component({ target: parent!, anchor: query.nextElementSibling || undefined });
+        return new component({
+            target: parent!,
+            anchor: query.nextElementSibling || undefined,
+            props,
+        });
 
     if (target === "before")
-        return new component({ target: parent!, anchor: query });
+        return new component({
+            target: parent!,
+            anchor: query,
+            props,
+        });
 
     if (target === "head")
-        return new component({ target: query, anchor: query.firstElementChild || undefined });
+        return new component({
+            target: query,
+            anchor: query.firstElementChild || undefined,
+            props,
+        });
 
     if (target === "tail")
-        return new component({ target: query });
+        return new component({
+            target: query,
+            props,
+        });
 
     throw new Error("invalid target");
 }

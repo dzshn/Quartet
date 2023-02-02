@@ -1,4 +1,5 @@
 import { Plugins } from "@patcher";
+import { ComponentType } from "svelte";
 
 // TODO: bother with ipc and all that (tetr.io also uses localStorage btw)
 
@@ -20,11 +21,6 @@ const settings = (() => {
         return defaults;
     }
 })() as Settings;
-
-export enum SettingType {
-    STRING,
-    BOOLEAN,
-}
 
 const proxyCache: Record<string, any> = {};
 
@@ -58,6 +54,12 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
 
 export const Settings = makeProxy(settings);
 
+export enum SettingType {
+    STRING,
+    BOOLEAN,
+    CUSTOM,
+}
+
 type TypeOfSetting<O extends PluginSettingDef> =
     O extends StringPluginSetting ? string :
     never;
@@ -87,10 +89,15 @@ export interface BooleanPluginSetting {
     default?: string;
 }
 
+export interface CustomPluginSetting {
+    type: SettingType.CUSTOM;
+    component: ComponentType;
+}
+
 export type SettingsDefinition = Record<string, PluginSettingDef>;
 
 export type PluginSettingDef = (
-    StringPluginSetting | BooleanPluginSetting
+    StringPluginSetting | BooleanPluginSetting | CustomPluginSetting
 );
 
 export function definePluginSettings<D extends SettingsDefinition>(def: D) {
