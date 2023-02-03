@@ -1,8 +1,10 @@
-name: Build and upload dev release
+name: Test Quartet and upload devbuild
 on:
     push:
+        branches:
+            - main
         paths:
-            - .github/workflows/release.yml
+            - .github/workflows/devbuild.yml
             - src/**
             - scripts/**
             - patcher/**
@@ -28,6 +30,12 @@ jobs:
 
             - name: Install project
               run: pnpm install
+
+            - name: Lint with ESLint
+              run: pnpm lint
+
+            - name: Check for TypeScript errors
+              run: pnpm tsc --noEmit
 
             - name: Build everything
               run: pnpm build --web

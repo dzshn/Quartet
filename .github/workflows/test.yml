@@ -1,9 +1,12 @@
-name: Test and build Quartet
+name: Test Quartet
 
 on:
-    push: {}
+    push:
+        branches-ignore:
+            - main
     pull_request:
-        branches: [ "main" ]
+        branches:
+            - main
 
 jobs:
     test-node:
@@ -42,4 +45,4 @@ jobs:
                   compiler: ldc-latest
 
             - name: Build qpatcher
-              run: cd patcher && dub build -b release
+              run: dub build --root=patcher -b release
