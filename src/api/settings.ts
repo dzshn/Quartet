@@ -86,7 +86,8 @@ export interface StringPluginSetting {
 export interface BooleanPluginSetting {
     type: SettingType.BOOLEAN;
     title: string;
-    default?: string;
+    description?: string;
+    default?: boolean;
 }
 
 export interface CustomPluginSetting {
@@ -98,7 +99,10 @@ export type SettingsDefinition = Record<string, PluginSettingDef>;
 
 export type PluginSettingDef = (
     StringPluginSetting | BooleanPluginSetting | CustomPluginSetting
-);
+) & {
+    title: string;
+    requiresRestart?: boolean;
+};
 
 export function definePluginSettings<D extends SettingsDefinition>(def: D) {
     const definedSettings = {

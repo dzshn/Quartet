@@ -3,36 +3,42 @@
     import { GrabbedObjects } from "Quartet";
 
     import plugins from "~plugins";
+
+    function notifyRestart(what: string) {
+        GrabbedObjects.showNotification({
+            msg: `${what} requires a restart to fully apply. hit F5 to restart!`,
+            icon: "warning",
+            color: "#fb84bc",
+        });
+    }
 </script>
 
-<div class="right_scroller" data-menuview="config_quartet">
+<div class="right_scroller ns" data-menuview="config_quartet">
     <div class="scroller_block">
-        <h1 class="ns">Quartet INDEV {QUARTET_VERSION}</h1>
+        <h1>Quartet indev {QUARTET_VERSION}</h1>
+        <p>welcome to Quartet!</p>
     </div>
 
     {#each plugins as plugin}
         {@const settings = Settings.plugins[plugin.name]}
+        {@const displayName = plugin.name.toUpperCase()}
 
         <div class="scroller_block">
-            <h2 class="ns">{plugin.name.toUpperCase()}</h2>
-            <p class="sub ns">{plugin.description}</p>
+            <h2>{displayName}</h2>
+            <p class="sub">{plugin.description}</p>
             <div
-                class="checkbox ns rg_target_pri"
+                class="checkbox rg_target_pri"
                 class:checked={settings.enabled}
                 class:disabled={plugin.required}
                 on:click={() => {
                     Settings.plugins[plugin.name].enabled = !settings.enabled;
                     if (plugin.patches?.length)
-                        GrabbedObjects.showNotification({
-                            msg: `${settings.enabled ? "enabling" : "disabling"} ${plugin.name.toUpperCase()} requires a restart to fully apply. hit F5 to restart!`,
-                            icon: "warning",
-                            color: "#fb84bc",
-                        });
+                        notifyRestart(`${settings.enabled ? "enabling" : "disabling"} ${displayName}`);
                 }}
             >
                 enable this plugin
             </div>
-            <div class="button_tr_h ns" style:display="flex">
+            <div class="button_tr_h" style:display="flex">
                 {#each plugin.authors as { name, url, github }}
                     <div class="qt-author">
                         {#if url}
@@ -61,16 +67,22 @@
                     </div>
                 {:else if def.type === SettingType.BOOLEAN}
                     <div
-                        class="checkbox ns rg_target_pri"
+                        class="checkbox rg_target_pri"
                         class:checked={Settings.plugins[plugin.name][key]}
+                        title={def.description}
                         on:click={() => Settings.plugins[plugin.name][key] = !settings[key]}
+                        on:click={() => notifyRestart(displayName)}
                     >
                         {def.title}
                     </div>
+                {:else if def.type == SettingType.CUSTOM}
+                    <svelte:component this={def.component} />
                 {/if}
             {/each}
         </div>
     {/each}
+
+    <p class="rc_moreinfo i18n_mono">read if cute</p>
 </div>
 
 <style>
