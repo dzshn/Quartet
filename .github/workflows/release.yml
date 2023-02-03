@@ -63,3 +63,14 @@ jobs:
 
             - name: Build patcher
               run: cd patcher && dub build -b release
+
+            - if: ${{ matrix.os == 'windows-latest' }}
+              run: mv patcher/qpatcher* dist/qpatcher-cli-windows.exe
+
+            - if: ${{ matrix.os == 'ubuntu-latest' }}
+              run: mv patcher/qpatcher dist/qpatcher-cli-linux
+
+            - name: Upload dev release
+              run: |
+                  gh release upload devbuild --clobber dist/qpatcher-*
+                  gh release edit devbuild
