@@ -75,7 +75,7 @@
                     >
                         {def.title}
                     </div>
-                {:else if def.type == SettingType.CUSTOM}
+                {:else if def.type === SettingType.CUSTOM}
                     <svelte:component this={def.component} />
                 {/if}
             {/each}
