@@ -58,6 +58,7 @@ export const Settings = makeProxy(settings);
 export enum SettingType {
     STRING,
     BOOLEAN,
+    SELECT,
     CUSTOM,
 }
 
@@ -91,6 +92,14 @@ export interface BooleanPluginSetting {
     default?: boolean;
 }
 
+export interface SelectPluginSetting {
+    type: SettingType.SELECT;
+    title: string;
+    description?: string;
+    options: (string | { label: string, value: string, title?: string })[];
+    default?: string;
+}
+
 export interface CustomPluginSetting {
     type: SettingType.CUSTOM;
     component: ComponentType;
@@ -99,7 +108,10 @@ export interface CustomPluginSetting {
 export type SettingsDefinition = Record<string, PluginSettingDef>;
 
 export type PluginSettingDef = (
-    StringPluginSetting | BooleanPluginSetting | CustomPluginSetting
+    StringPluginSetting
+    | BooleanPluginSetting
+    | SelectPluginSetting
+    | CustomPluginSetting
 ) & {
     title: string;
     requiresRestart?: boolean;

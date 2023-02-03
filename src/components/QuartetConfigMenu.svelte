@@ -35,6 +35,8 @@
                     if (plugin.patches?.length)
                         notifyRestart(`${settings.enabled ? "enabling" : "disabling"} ${displayName}`);
                 }}
+                data-hover="tap"
+                data-hit="click"
             >
                 enable this plugin
             </div>
@@ -71,9 +73,32 @@
                         class:checked={Settings.plugins[plugin.name][key]}
                         title={def.description}
                         on:click={() => Settings.plugins[plugin.name][key] = !settings[key]}
-                        on:click={() => notifyRestart(displayName)}
+                        on:click={() => def.requiresRestart && notifyRestart(displayName)}
+                        data-hover="tap"
+                        data-hit="click"
                     >
                         {def.title}
+                    </div>
+                {:else if def.type == SettingType.SELECT}
+                    <div class="control_group flex-row">
+                        <h1>{def.title}</h1>
+                        {#if def.description}
+                            <p>{def.description}</p>
+                        {/if}
+                        {#each def.options as opt}
+                            {@const option = typeof opt === "string" ? { label: opt, value: opt } : opt}
+                            <div
+                                class="control_button rg_target_pri flex-item"
+                                class:pressed={Settings.plugins[plugin.name][key] === option.value}
+                                title={option.title}
+                                on:click={() => Settings.plugins[plugin.name][key] = option.value}
+                                on:click={() => def.requiresRestart && notifyRestart(displayName)}
+                                data-hover="tap"
+                                data-hit="click"
+                            >
+                                {option.label}
+                            </div>
+                        {/each}
                     </div>
                 {:else if def.type === SettingType.CUSTOM}
                     <svelte:component this={def.component} />
@@ -99,5 +124,17 @@
     }
     .qt-author > img {
         border-radius: 100%;
+    }
+
+    .control_group .flex-item {
+        min-width: 10vw;
+    }
+
+    /* shhhh no one will know */
+    .control_group {
+        padding-right: .75em;
+    }
+    .control_group .flex-item:last-child {
+        margin-right: .25em;
     }
 </style>

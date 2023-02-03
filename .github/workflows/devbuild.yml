@@ -1,0 +1,89 @@
+name: Test Quartet and upload devbuild
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - .github/workflows/devbuild.yml
+            - src/**
+            - scripts/**
+            - patcher/**
+            - package.json
+            - pnpm-lock.yaml
+
+permissions:
+    contents: write
+
+jobs:
+    build-node:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: pnpm/action-setup@v2
+
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: "pnpm"
+
+            - name: Install project
+              run: pnpm install
+
+            - name: Lint with ESLint
+              run: pnpm lint
+
+            - name: Check for TypeScript errors
+              run: pnpm tsc --noEmit
+
+            - name: Build everything
+              run: pnpm build --web
+
+            - name: Clean irrelevant files
+              run: rm -f dist/*.map dist/*.txt
+
+            - name: Set release tag
+              run: |
+                  echo "release_tag=$(jq .version package.json -r) ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
+
+            - name: Upload dev release
+              run: |
+                  gh release upload devbuild --clobber dist/*
+                  gh release edit devbuild --title "Quartet INDEV $RELEASE_TAG"
+              env:
+                  RELEASE_TAG: ${{ env.release_tag }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-d:
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: dlang-community/setup-dlang@v1
+              with:
+                  compiler: ldc-latest
+
+            - name: Build patcher
+              run: dub build --root=patcher -b release
+
+            - run: ls . patcher
+
+            - if: ${{ matrix.os == 'windows-latest' }}
+              run: mv patcher/qpatcher.exe qpatcher-cli-windows.exe
+
+            - if: ${{ matrix.os == 'ubuntu-latest' }}
+              run: mv patcher/qpatcher qpatcher-cli-linux
+
+            - name: Upload dev release
+              run: gh release upload devbuild --clobber qpatcher-*
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

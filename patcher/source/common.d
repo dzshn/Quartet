@@ -3,28 +3,29 @@ import std.format : format;
 import std.json : JSONValue, toJSON;
 import std.path : buildPath;
 import std.stdio : toFile, writeln;
+import std.process : environment;
 
 
 string guessPath() {
     // TODO: find more of these
     version (Windows) {
-        const localAppData = environment.get("LOCALAPPDATA");
-        const paths = [
+        auto localAppData = environment.get("LOCALAPPDATA");
+        auto paths = [
             localAppData.buildPath("Programs", "tetrio-desktop")
         ];
     } else version (OSX) {
-        const paths = [
+        auto paths = [
             "~/Applications".expandTilde,
         ];
     } else version (Posix) {
-        const paths = [
+        auto paths = [
             "/opt/TETR.IO"
         ];
     } else {
-        const string[] paths = [];
+        auto string[] paths = [];
     }
 
-    static foreach (path; paths) {
+    foreach (path; paths) {
         if (path.exists) {
             writeln("Found path ", path);
             return path;
