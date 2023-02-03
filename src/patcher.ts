@@ -1,5 +1,5 @@
 import { Log } from "@api";
-import { DefinedSettings, Settings } from "@api/settings";
+import { DefinedSettings, Settings, SettingType } from "@api/settings";
 import type { ComponentConstructorOptions, ComponentType } from "svelte";
 
 import plugins from "~plugins";
@@ -114,8 +114,13 @@ function initialiseSettings(plugin: Plugin) {
 
     plugin.settings.pluginName = plugin.name;
     for (const [key, def] of Object.entries(plugin.settings.def)) {
-        if ("default" in def)
+        if (key in Settings.plugins[plugin.name])
+            continue;
+        if ("default" in def) {
             Settings.plugins[plugin.name][key] = def.default;
+        } else if (def.type === SettingType.SELECT) {
+            Settings.plugins[plugin.name][key] = def.options[0];
+        }
     }
 }
 
