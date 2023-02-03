@@ -54,6 +54,9 @@ jobs:
                 os: [ubuntu-latest, windows-latest]
 
         runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                shell: bash
         steps:
             - uses: actions/checkout@v3
 
@@ -62,13 +65,15 @@ jobs:
                   compiler: ldc-latest
 
             - name: Build patcher
-              run: cd patcher && dub build -b release
+              run: dub build --root=patcher -b release
+
+            - run: ls . patcher
 
             - if: ${{ matrix.os == 'windows-latest' }}
-              run: mv qpatcher* qpatcher-cli-windows.exe
+              run: mv patcher/qpatcher.exe qpatcher-cli-windows.exe
 
             - if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: mv qpatcher* qpatcher-cli-linux
+              run: mv patcher/qpatcher qpatcher-cli-linux
 
             - name: Upload dev release
               run: |
