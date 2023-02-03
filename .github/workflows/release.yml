@@ -5,6 +5,7 @@ on:
             - .github/workflows/release.yml
             - src/**
             - scripts/**
+            - patcher/**
             - package.json
             - pnpm-lock.yaml
 
