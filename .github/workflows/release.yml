@@ -68,9 +68,11 @@ jobs:
               run: mv qpatcher* qpatcher-cli-windows.exe
 
             - if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: mv qpatcher qpatcher-cli-linux
+              run: mv qpatcher* qpatcher-cli-linux
 
             - name: Upload dev release
               run: |
                   gh release upload devbuild --clobber qpatcher-*
                   gh release edit devbuild
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
