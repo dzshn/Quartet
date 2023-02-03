@@ -103,6 +103,6 @@ export const GrabbedObjects = {} as {
     };
     Fingerprint: {
         get: () => string | null;
-        getWhenReady: (cb: (fingerpint: string) => void) => void;
+        getWhenReady: (cb: (fingerprint: string) => void) => void;
     };
 };

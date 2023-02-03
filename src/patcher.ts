@@ -49,7 +49,7 @@ if (!QUARTET_WEB) {
     //@ts-ignore
     window.IS_ELECTRON = true;
     //@ts-ignore
-    window.IPC = QuartetBeryl.ipc;
+    window.IPC = QuartetBeryl._tetrioIpc;
     //@ts-ignore
     window.REFRESH_RATE = QuartetBeryl.refreshRate;
 
