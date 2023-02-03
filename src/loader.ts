@@ -40,6 +40,10 @@ if (!process.argv.includes("--vanilla")) {
                 options.webPreferences.preload = join(__dirname, "preload.js");
                 // We rewrite preload completely, so we might as well make it safer.
                 options.webPreferences.contextIsolation = true;
+                //@ts-ignore (doesn't exist in newer electron versions)
+                options.webPreferences.worldSafeExecuteJavaScript = true;
+                // Why is this set to false??
+                options.webPreferences.backgroundThrottling = true;
             }
 
             super(options);

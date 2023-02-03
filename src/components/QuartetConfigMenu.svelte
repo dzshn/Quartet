@@ -79,7 +79,7 @@
                     >
                         {def.title}
                     </div>
-                {:else if def.type == SettingType.SELECT}
+                {:else if def.type === SettingType.SELECT}
                     <div class="control_group flex-row">
                         <h1>{def.title}</h1>
                         {#if def.description}
