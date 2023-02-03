@@ -76,8 +76,6 @@ jobs:
               run: mv patcher/qpatcher qpatcher-cli-linux
 
             - name: Upload dev release
-              run: |
-                  gh release upload devbuild --clobber qpatcher-*
-                  gh release edit devbuild
+              run: gh release upload devbuild --clobber qpatcher-*
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
