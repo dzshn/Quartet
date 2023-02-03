@@ -45,3 +45,20 @@ jobs:
               env:
                   RELEASE_TAG: ${{ env.release_tag }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-d:
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: dlang-community/setup-dlang@v1
+              with:
+                  compiler: ldc-latest
+
+            - name: Build patcher
+              run: cd patcher && dub build -b release
