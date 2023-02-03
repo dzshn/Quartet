@@ -10,7 +10,7 @@ string guessPath() {
     version (Windows) {
         const localAppData = environment.get("LOCALAPPDATA");
         const paths = [
-            localAppData.buildPath("tetrio-desktop")
+            localAppData.buildPath("Programs", "tetrio-desktop")
         ];
     } else version (OSX) {
         const paths = [
