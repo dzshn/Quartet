@@ -3,6 +3,7 @@ import std.format : format;
 import std.json : JSONValue, toJSON;
 import std.path : buildPath;
 import std.stdio : toFile, writeln;
+import std.process : environment;
 
 
 string guessPath() {
