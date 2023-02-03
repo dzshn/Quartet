@@ -100,5 +100,9 @@ export const GrabbedObjects = {} as {
         update: (silent: boolean) => void;
         /** Set from bootstrap.js(?), this returns the SHA-1 sum of tetrio.js */
         i: () => string;
-    }
+    };
+    Fingerprint: {
+        get: () => string | null;
+        getWhenReady: (cb: (fingerpint: string) => void) => void;
+    };
 };
