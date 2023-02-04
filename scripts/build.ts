@@ -34,7 +34,7 @@ const esbuildOpts: esbuild.BuildOptions = {
     platform: "node",
     target: ["chrome83"],
     external: ["electron", "systeminformation"],
-    sourcemap: "external",
+    sourcemap: watch ? "inline" : "external",
     legalComments: "none",
     plugins: [
         {
@@ -74,6 +74,7 @@ const esbuildOpts: esbuild.BuildOptions = {
         QUARTET_VERSION: JSON.stringify(version),
         QUARTET_DEV: JSON.stringify(watch),
         QUARTET_WEB: JSON.stringify(web),
+        QUARTET_USERSCRIPT: "false",
     },
     banner: {
         js: dedent(`\
@@ -124,6 +125,7 @@ async function main () {
             globalName: "Quartet",
             define: {
                 ...esbuildOpts.define,
+                QUARTET_USERSCRIPT: "true",
                 window: "unsafeWindow",
             },
             banner: {

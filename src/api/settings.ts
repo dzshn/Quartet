@@ -1,5 +1,6 @@
 import { Plugins } from "@patcher";
 import { ComponentType } from "svelte";
+import { IpcChannel } from "types";
 
 // TODO: bother with ipc and all that (tetr.io also uses localStorage btw)
 
@@ -16,7 +17,7 @@ const defaults = {
 
 const settings = (() => {
     try {
-        return { ...defaults, ...JSON.parse(localStorage.getItem("quartetConfig") || "") };
+        return { ...defaults, ...JSON.parse(QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS)) };
     } catch {
         return defaults;
     }
@@ -46,7 +47,7 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
         },
         set(target, prop: Extract<keyof T, string>, value) {
             target[prop] = value;
-            localStorage.setItem("quartetConfig", JSON.stringify(root));
+            QuartetBeryl.ipc.send(IpcChannel.SET_SETTINGS, JSON.stringify(root, null, 4));
             return true;
         },
     });

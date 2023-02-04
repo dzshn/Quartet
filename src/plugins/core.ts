@@ -1,4 +1,4 @@
-import { Devs } from "@api/constants";
+import { anonymousUA, Devs } from "@api/constants";
 import { definePluginSettings, SettingType } from "@api/settings";
 import QuartetConfig from "@components/QuartetConfig.svelte";
 import QuartetConfigMenu from "@components/QuartetConfigMenu.svelte";
@@ -14,7 +14,11 @@ const settings = definePluginSettings({
     }
 });
 
-const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
+// We can't actually change the UA on userscripts, so leave it as what
+// TETR.IO would otherwise set to as to not accidentally trigger somethign
+const userAgent = QUARTET_USERSCRIPT ?
+    navigator.userAgent.replace("//", "--") :
+    anonymousUA;
 
 export default {
     name: "Core",
@@ -61,7 +65,7 @@ export default {
             //    timestamp + random number,
             //    display res,
             //    your keybinds,
-            //    ARR/DAS/SDF
+            //    ARR/DAS/SDF,
             //    your computer's serial ID
             match: /`\${\w+\} \/\/ \$\{\w+\}-core \/\/ \$\{\w+\}-GB \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\}`/,
             replace: `\`${userAgent} // 8-core // 0-GB // Intel(R) HD Graphics // $1 // $2 // 1920x1080@1 // $3 // $4 // N/A\``,
@@ -72,4 +76,11 @@ export default {
         { component: QuartetConfig, target: "after", at: "#config_electron" },
         { component: QuartetConfigMenu, target: "tail", at: "#menus" },
     ],
+
+    beforeBootstrap() {
+        if (!QUARTET_USERSCRIPT && settings.data.anonymiseFingerprint)
+            Object.defineProperty(navigator, "userAgent", {
+                get: () => anonymousUA,
+            });
+    }
 } satisfies Plugin;

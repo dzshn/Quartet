@@ -41,6 +41,7 @@ export interface Plugin {
     components?: ComponentHook[];
     start?: () => void;
     stop?: () => void;
+    beforeBootstrap?: () => void;
     settings?: DefinedSettings;
 }
 
@@ -49,7 +50,7 @@ if (!QUARTET_WEB) {
     //@ts-ignore
     window.IS_ELECTRON = true;
     //@ts-ignore
-    window.IPC = QuartetBeryl.ipc;
+    window.IPC = QuartetBeryl._tetrioIpc;
     //@ts-ignore
     window.REFRESH_RATE = QuartetBeryl.refreshRate;
 
@@ -130,6 +131,11 @@ function applyPatches(src: string): string {
         initialiseSettings(plugin);
         if (!Settings.plugins[plugin.name].enabled)
             continue;
+
+        if (plugin.beforeBootstrap) {
+            Log.log("Patcher", "Calling pre-bootstrap hook from", plugin.name);
+            plugin.beforeBootstrap();
+        }
 
         if (plugin.patches?.length)
             Log.log("Patcher", "Applying patches from", plugin.name);

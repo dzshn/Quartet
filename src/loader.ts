@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import electron, { app, BrowserWindowConstructorOptions } from "electron";
+import { anonymousUA } from "@api/constants";
+import { Settings } from "@api/settings";
+import electron, { app, BrowserWindowConstructorOptions, session } from "electron";
+import { readSettingsSync } from "ipc";
 import { join } from "path";
 
 
@@ -34,6 +37,13 @@ const tetrioAsarPath = join(require.main!.path, "..", "_app.asar");
 app.setAppPath(tetrioAsarPath);
 
 if (!process.argv.includes("--vanilla")) {
+    let settings: Partial<Settings>;
+    try {
+        settings = JSON.parse(readSettingsSync());
+    } catch {
+        settings = {};
+    }
+
     class BrowserWindow extends electron.BrowserWindow {
         constructor(options?: BrowserWindowConstructorOptions) {
             if (options?.webPreferences?.preload && options.title) {
@@ -54,6 +64,16 @@ if (!process.argv.includes("--vanilla")) {
     const cachedElectron = require.cache[require.resolve("electron")]!;
     delete cachedElectron.exports;
     cachedElectron.exports = { ...electron, BrowserWindow };
+
+    app.whenReady().then(() => {
+        // Default is to always do, but defaults may not be set yet, so regard null as true
+        if (settings.plugins?.Core.anonymiseFingerprint !== false) {
+            session.defaultSession.webRequest.onBeforeSendHeaders(({ requestHeaders }, cb) => {
+                requestHeaders["user-agent"] = anonymousUA;
+                cb({ cancel: false, requestHeaders });
+            });
+        }
+    });
 
     console.log("[Quartet] Loaded! Booting up game now");
 } else {
