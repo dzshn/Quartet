@@ -20,7 +20,7 @@
     </div>
 
     {#each plugins as plugin}
-        {@const settings = Settings.plugins[plugin.name]}
+        {@const settings = Settings[plugin.name]}
         {@const displayName = plugin.name.toUpperCase()}
 
         <div class="scroller_block">
@@ -31,7 +31,7 @@
                 class:checked={settings.enabled}
                 class:disabled={plugin.required}
                 on:click={() => {
-                    Settings.plugins[plugin.name].enabled = !settings.enabled;
+                    Settings[plugin.name].enabled = !settings.enabled;
                     if (plugin.patches?.length)
                         notifyRestart(`${settings.enabled ? "enabling" : "disabling"} ${displayName}`);
                 }}
@@ -55,8 +55,11 @@
                 {/each}
             </div>
 
-            {#each Object.entries(plugin.settings?.def ?? {}) as [key, def]}
+            {#if plugin.settings}
                 <hr />
+            {/if}
+
+            {#each Object.entries(plugin.settings?.def ?? {}) as [key, def]}
                 {#if def.type === SettingType.STRING}
                     <div class="control_group">
                         <h1>{def.title}</h1>
@@ -64,15 +67,15 @@
                             placeholder={def.placeholder}
                             autocomplete="off"
                             class="config_input rg_target_pri"
-                            bind:value={Settings.plugins[plugin.name][key]}
+                            bind:value={Settings[plugin.name][key]}
                         />
                     </div>
                 {:else if def.type === SettingType.BOOLEAN}
                     <div
                         class="checkbox rg_target_pri"
-                        class:checked={Settings.plugins[plugin.name][key]}
+                        class:checked={Settings[plugin.name][key]}
                         title={def.description}
-                        on:click={() => Settings.plugins[plugin.name][key] = !settings[key]}
+                        on:click={() => Settings[plugin.name][key] = !settings[key]}
                         on:click={() => def.requiresRestart && notifyRestart(displayName)}
                         data-hover="tap"
                         data-hit="click"
@@ -89,9 +92,9 @@
                             {@const option = typeof opt === "string" ? { label: opt, value: opt } : opt}
                             <div
                                 class="control_button rg_target_pri flex-item"
-                                class:pressed={Settings.plugins[plugin.name][key] === option.value}
+                                class:pressed={Settings[plugin.name][key] === option.value}
                                 title={option.title}
-                                on:click={() => Settings.plugins[plugin.name][key] = option.value}
+                                on:click={() => Settings[plugin.name][key] = option.value}
                                 on:click={() => def.requiresRestart && notifyRestart(displayName)}
                                 data-hover="tap"
                                 data-hit="click"

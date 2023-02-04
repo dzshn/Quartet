@@ -20,7 +20,8 @@ const settings = definePluginSettings({
 
             return [
                 "none",
-                ...menus.map(key => {
+                // Also sort by length so options grid looks a bit nicer
+                ...menus.sort().sort((a, b) => a.length - b.length).map(key => {
                     const menu = GrabbedObjects.Menus[key];
                     return { label: key, value: key, title: `Header: ${menu.header}\nFooter: ${menu.footer}` };
                 }),

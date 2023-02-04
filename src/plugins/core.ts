@@ -21,7 +21,7 @@ const userAgent = QUARTET_USERSCRIPT ?
     anonymousUA;
 
 export default {
-    name: "Core",
+    name: "Quartet",
     description: "Core Quartet patches and hooks",
     authors: [Devs.dzshn],
     required: true,

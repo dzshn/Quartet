@@ -67,7 +67,7 @@ if (!process.argv.includes("--vanilla")) {
 
     app.whenReady().then(() => {
         // Default is to always do, but defaults may not be set yet, so regard null as true
-        if (settings.plugins?.Core.anonymiseFingerprint !== false) {
+        if (settings.Quartet?.anonymiseFingerprint !== false) {
             session.defaultSession.webRequest.onBeforeSendHeaders(({ requestHeaders }, cb) => {
                 requestHeaders["user-agent"] = anonymousUA;
                 cb({ cancel: false, requestHeaders });

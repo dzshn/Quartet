@@ -5,21 +5,17 @@ import { IpcChannel } from "types";
 // TODO: bother with ipc and all that (tetr.io also uses localStorage btw)
 
 export interface Settings {
-    plugins: Record<string, {
+    [plugin: string]: {
         enabled: boolean;
         [option: string]: any;
-    }>;
+    },
 }
-
-const defaults = {
-    plugins: {},
-};
 
 const settings = (() => {
     try {
-        return { ...defaults, ...JSON.parse(QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS)) };
+        return JSON.parse(QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS));
     } catch {
-        return defaults;
+        return {};
     }
 })() as Settings;
 
@@ -31,10 +27,10 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
             const value = target[prop];
 
             if (!(prop in target)) {
-                if (path === "plugins" && prop in Plugins) {
+                if (path === "" && prop in Plugins) {
                     return (target[prop] as any) = makeProxy({
                         enabled: Plugins[prop].required || false
-                    }, root, `plugins.${prop}`);
+                    }, root, `${prop}`);
                 }
 
                 return value;
@@ -122,7 +118,7 @@ export function definePluginSettings<D extends SettingsDefinition>(def: D) {
         get data() {
             if (!definedSettings.pluginName)
                 throw new Error("not initialised yet!!");
-            return Settings.plugins[definedSettings.pluginName];
+            return Settings[definedSettings.pluginName];
         },
         def,
         pluginName: "",

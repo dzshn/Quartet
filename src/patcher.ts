@@ -109,18 +109,18 @@ export function hookComponent<C extends ComponentType>(
 }
 
 function initialiseSettings(plugin: Plugin) {
-    Settings.plugins[plugin.name] ??= { enabled: !!plugin.required };
+    Settings[plugin.name] ??= { enabled: !!plugin.required };
     if (!plugin.settings)
         return;
 
     plugin.settings.pluginName = plugin.name;
     for (const [key, def] of Object.entries(plugin.settings.def)) {
-        if (key in Settings.plugins[plugin.name])
+        if (key in Settings[plugin.name])
             continue;
         if ("default" in def) {
-            Settings.plugins[plugin.name][key] = def.default;
+            Settings[plugin.name][key] = def.default;
         } else if (def.type === SettingType.SELECT) {
-            Settings.plugins[plugin.name][key] = def.options[0];
+            Settings[plugin.name][key] = def.options[0];
         }
     }
 }
@@ -129,7 +129,7 @@ function applyPatches(src: string): string {
     Log.log("Patcher", "Applying all patches now!");
     for (const plugin of plugins) {
         initialiseSettings(plugin);
-        if (!Settings.plugins[plugin.name].enabled)
+        if (!Settings[plugin.name].enabled)
             continue;
 
         if (plugin.beforeBootstrap) {
@@ -158,7 +158,7 @@ function applyPatches(src: string): string {
 bootstrapDone.then(() => {
     Log.log("Patcher", "Hooking up all components now!");
     for (const plugin of plugins) {
-        if (!plugin.required && !Settings.plugins[plugin.name].enabled)
+        if (!plugin.required && !Settings[plugin.name].enabled)
             continue;
 
         if (plugin.components?.length)
@@ -175,7 +175,7 @@ bootstrapDone.then(() => {
 
     Log.log("Patcher", "Starting up all plugins now!");
     for (const plugin of plugins) {
-        if (!plugin.required && !Settings.plugins[plugin.name].enabled)
+        if (!plugin.required && !Settings[plugin.name].enabled)
             continue;
 
         if (!plugin.start)
