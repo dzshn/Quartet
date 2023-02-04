@@ -110,7 +110,7 @@
         </div>
     {/each}
 
-    <p class="rc_moreinfo i18n_mono">read if cute</p>
+    <p class="rc_moreinfo" stlye:font-family="PFW">read if cute</p>
 </div>
 
 <style>

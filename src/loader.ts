@@ -57,6 +57,11 @@ if (!process.argv.includes("--vanilla")) {
             }
 
             super(options);
+
+            // Silly hack in case you cannot open devtools (usually because you exploded this script or preload)
+            if (process.argv.includes("--devtools"))
+                //@ts-ignore
+                this.toggleDevTools();
         }
     }
 
