@@ -1,5 +1,5 @@
 import { anonymousUA, Devs } from "@api/constants";
-import { definePluginSettings, Settings, SettingType } from "@api/settings";
+import { definePluginSettings, SettingType } from "@api/settings";
 import QuartetConfig from "@components/QuartetConfig.svelte";
 import QuartetConfigMenu from "@components/QuartetConfigMenu.svelte";
 import { Plugin } from "@patcher";
@@ -17,9 +17,6 @@ const settings = definePluginSettings({
 const userAgent = QUARTET_USERSCRIPT ?
     navigator.userAgent.replace("//", "--") :
     anonymousUA;
-
-if (!QUARTET_USERSCRIPT && Settings.plugins.Core.anonymiseFingerprint)
-    Object.defineProperty(navigator, "userAgent", anonymousUA);
 
 export default {
     name: "Core",
@@ -77,4 +74,11 @@ export default {
         { component: QuartetConfig, target: "after", at: "#config_electron" },
         { component: QuartetConfigMenu, target: "tail", at: "#menus" },
     ],
+
+    start() {
+        if (!QUARTET_USERSCRIPT && settings.data.anonymiseFingerprint)
+            Object.defineProperty(navigator, "userAgent", {
+                get: () => anonymousUA,
+            });
+    }
 } satisfies Plugin;
