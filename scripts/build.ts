@@ -73,7 +73,7 @@ const esbuildOpts: esbuild.BuildOptions = {
     define: {
         QUARTET_VERSION: JSON.stringify(version),
         QUARTET_DEV: JSON.stringify(watch),
-        QUARTET_WEB: JSON.stringify(web),
+        QUARTET_WEB: "false",
         QUARTET_USERSCRIPT: "false",
     },
     banner: {
@@ -117,14 +117,23 @@ async function main () {
     const contexts: esbuild.BuildContext[] = [];
 
     if (web) {
-        const userscriptCtx = await esbuild.context({
+        const esbuildWebOpts: esbuild.BuildOptions = {
             ...esbuildOpts,
             entryPoints: ["src/Quartet.ts"],
-            outfile: "dist/Quartet.user.js",
             format: "iife",
             globalName: "Quartet",
             define: {
                 ...esbuildOpts.define,
+                QUARTET_WEB: "true",
+            },
+            inject: ["src/browser/shims.ts"],
+        };
+
+        const userscriptCtx = await esbuild.context({
+            ...esbuildWebOpts,
+            outfile: "dist/Quartet.user.js",
+            define: {
+                ...esbuildWebOpts.define,
                 QUARTET_USERSCRIPT: "true",
                 window: "unsafeWindow",
             },
@@ -145,7 +154,7 @@ async function main () {
             },
             footer: {
                 js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet"
-            }
+            },
         });
 
         contexts.push(userscriptCtx);
