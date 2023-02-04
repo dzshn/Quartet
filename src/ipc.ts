@@ -1,5 +1,5 @@
 import { app, ipcMain } from "electron";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { IpcChannel } from "types";
 
@@ -19,5 +19,5 @@ export function writeSettingsSync(data: string) {
     return writeFileSync(SETTINGS_PATH, data);
 }
 
-ipcMain.on(IpcChannel.GET_SETTINGS, (event) => event.returnValue = readSettingsSync());
+ipcMain.on(IpcChannel.GET_SETTINGS, event => event.returnValue = readSettingsSync());
 ipcMain.on(IpcChannel.SET_SETTINGS, (event, data: string) => event.returnValue = writeSettingsSync(data));
