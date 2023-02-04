@@ -19,8 +19,10 @@ const tetrioChannels = [
     "vsync",
 ];
 
-function assertChannelAllowed(channel: string) {
-    if (!(channel in IpcChannel))
+const quartetChannels = Object.entries(IpcChannel).map(([, v]) => v);
+
+function assertChannelAllowed(channel: IpcChannel) {
+    if (!quartetChannels.includes(channel))
         throw new Error(`Illegal IPC channel ${channel}. This incident will be reported.`);
 }
 
