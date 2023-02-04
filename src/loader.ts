@@ -57,7 +57,6 @@ if (!process.argv.includes("--vanilla")) {
             }
 
             super(options);
-            this.toggleDevTools();
         }
     }
 

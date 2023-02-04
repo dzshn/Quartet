@@ -14,6 +14,8 @@ const settings = definePluginSettings({
     }
 });
 
+// We can't actually change the UA on userscripts, so leave it as what
+// TETR.IO would otherwise set to as to not accidentally trigger somethign
 const userAgent = QUARTET_USERSCRIPT ?
     navigator.userAgent.replace("//", "--") :
     anonymousUA;
