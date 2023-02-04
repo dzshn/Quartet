@@ -1,10 +1,11 @@
 import { app, ipcMain } from "electron";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { IpcChannel } from "types";
+import { DataDir, IpcChannel } from "types";
 
 export const DATA_DIR = join(app.getPath("userData"), "..", "Quartet");
 export const SETTINGS_PATH = join(DATA_DIR, "settings.json");
+export const THEMES_DIR = join(DATA_DIR, "themes");
 
 export function readSettingsSync() {
     try {
@@ -21,3 +22,13 @@ export function writeSettingsSync(data: string) {
 
 ipcMain.on(IpcChannel.GET_SETTINGS, event => event.returnValue = readSettingsSync());
 ipcMain.on(IpcChannel.SET_SETTINGS, (_, data: string) => writeSettingsSync(data));
+ipcMain.on(IpcChannel.GET_PATH, (event, dir: DataDir) => {
+    if (dir === DataDir.DATA)
+        event.returnValue = DATA_DIR;
+    else if (dir === DataDir.SETTINGS)
+        event.returnValue = SETTINGS_PATH;
+    else if (dir === DataDir.THEMES)
+        event.returnValue = THEMES_DIR;
+    else
+        throw new Error(`unknown directory ${dir}`);
+});

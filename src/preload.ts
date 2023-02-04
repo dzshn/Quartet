@@ -19,12 +19,14 @@
 import { anonymousUA } from "@api/constants";
 import { Settings } from "@api/settings";
 import { contextBridge, webFrame } from "electron";
-import { readFileSync } from "fs";
+import { mkdir, readFile, readFileSync, watch } from "fs";
 import { join } from "path";
 import QuartetBeryl from "QuartetBeryl";
-import { IpcChannel } from "types";
+import { DataDir, IpcChannel } from "types";
 
 contextBridge.exposeInMainWorld("QuartetBeryl", QuartetBeryl);
+
+const themesDir = QuartetBeryl.ipc.sendSync(IpcChannel.GET_PATH, DataDir.THEMES);
 
 let settings: Partial<Settings>;
 try {
@@ -39,5 +41,21 @@ if (settings.Quartet?.anonymiseFingerprint)
             get: () => ${JSON.stringify(anonymousUA)},
         });
     `);
+
+const themeKeys: Record<string, string> = {};
+
+mkdir(themesDir, { recursive: true }, () => {
+    watch(themesDir, { persistent: false }, (_, filename) => {
+        if (!filename) return;
+
+        const key = themeKeys[filename];
+        if (key)
+            webFrame.removeInsertedCSS(key);
+
+        readFile(join(themesDir, filename), { encoding: "utf-8" }, (_, css) => {
+            themeKeys[filename] = webFrame.insertCSS(css);
+        });
+    });
+});
 
 webFrame.executeJavaScript(readFileSync(join(__dirname, "quartet.js"), "utf-8"));
