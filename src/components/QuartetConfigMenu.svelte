@@ -110,7 +110,7 @@
         </div>
     {/each}
 
-    <p class="rc_moreinfo" stlye:font-family="PFW">read if cute</p>
+    <p class="rc_moreinfo" style:font-family="PFW">read if cute</p>
 </div>
 
 <style>
@@ -130,7 +130,8 @@
     }
 
     .control_group .flex-item {
-        min-width: 10vw;
+        min-width: fit-content;
+        width: 10vw;
     }
 
     /* shhhh no one will know */
