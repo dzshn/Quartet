@@ -16,11 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { anonymousUA } from "@api/constants";
+import { Settings } from "@api/settings";
 import { contextBridge, webFrame } from "electron";
 import { readFileSync } from "fs";
 import { join } from "path";
 import QuartetBeryl from "QuartetBeryl";
+import { IpcChannel } from "types";
 
 contextBridge.exposeInMainWorld("QuartetBeryl", QuartetBeryl);
+
+let settings: Partial<Settings>;
+try {
+    settings = JSON.parse(QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS));
+} catch (error) {
+    settings = {};
+}
+
+if (settings.Quartet?.anonymiseFingerprint)
+    webFrame.executeJavaScript(`
+        void Object.defineProperty(navigator, "userAgent", {
+            get: () => ${JSON.stringify(anonymousUA)},
+        });
+    `);
 
 webFrame.executeJavaScript(readFileSync(join(__dirname, "quartet.js"), "utf-8"));

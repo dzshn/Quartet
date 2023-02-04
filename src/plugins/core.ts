@@ -15,7 +15,7 @@ const settings = definePluginSettings({
 });
 
 // We can't actually change the UA on userscripts, so leave it as what
-// TETR.IO would otherwise set to as to not accidentally trigger somethign
+// TETR.IO would otherwise set to as to not accidentally trigger something
 const userAgent = QUARTET_USERSCRIPT ?
     navigator.userAgent.replace("//", "--") :
     anonymousUA;
@@ -76,11 +76,4 @@ export default {
         { component: QuartetConfig, target: "after", at: "#config_electron" },
         { component: QuartetConfigMenu, target: "tail", at: "#menus" },
     ],
-
-    beforeBootstrap() {
-        if (!QUARTET_USERSCRIPT && settings.data.anonymiseFingerprint)
-            Object.defineProperty(navigator, "userAgent", {
-                get: () => anonymousUA,
-            });
-    }
 } satisfies Plugin;
