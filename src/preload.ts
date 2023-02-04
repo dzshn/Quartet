@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { Log } from "@api";
 import { anonymousUA } from "@api/constants";
 import { Settings } from "@api/settings";
 import { contextBridge, webFrame } from "electron";
-import { mkdir, readFile, readFileSync, watch } from "fs";
+import { mkdir, readdir, readFile, readFileSync, stat, watch } from "fs";
 import { join } from "path";
 import QuartetBeryl from "QuartetBeryl";
 import { DataDir, IpcChannel } from "types";
@@ -44,17 +45,60 @@ if (settings.Quartet?.anonymiseFingerprint)
 
 const themeKeys: Record<string, string> = {};
 
+function applyThemeFile(path: string) {
+    Log.log("CSS", `applying ${path}`);
+
+    const key = themeKeys[path];
+    if (key)
+        webFrame.removeInsertedCSS(key);
+
+    readFile(path, { encoding: "utf-8" }, (err, css) => {
+        if (err) {
+            Log.error("CSS", `error applying ${path}: ${err}`);
+            return;
+        }
+
+        themeKeys[path] = webFrame.insertCSS(css);
+    });
+}
+
 mkdir(themesDir, { recursive: true }, () => {
-    watch(themesDir, { persistent: false }, (_, filename) => {
-        if (!filename) return;
+    readdir(themesDir, (err, files) => {
+        if (err) {
+            Log.error("CSS", "error reading themes directory", err);
+            return;
+        }
 
-        const key = themeKeys[filename];
-        if (key)
-            webFrame.removeInsertedCSS(key);
+        files.forEach(filename => {
+            if (filename.startsWith(".") || !filename.endsWith(".css"))
+                return;
 
-        readFile(join(themesDir, filename), { encoding: "utf-8" }, (_, css) => {
-            themeKeys[filename] = webFrame.insertCSS(css);
+            applyThemeFile(join(themesDir, filename));
         });
+    });
+
+    const fileTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+
+    watch(themesDir, { persistent: false }, (event, filename) => {
+        const path = join(themesDir, filename);
+        if (!filename || filename.startsWith(".") || !filename.endsWith(".css"))
+            return;
+
+        if (event === "rename") {
+            stat(path, err => {
+                if (err) {
+                    Log.log("CSS", `unloading ${path} (file deleted)`);
+                    const key = themeKeys[path];
+                    if (key)
+                        webFrame.removeInsertedCSS(key);
+                }
+            });
+            return;
+        }
+
+        // Debounce theme updates
+        clearTimeout(fileTimeouts[filename]);
+        fileTimeouts[filename] = setTimeout(() => applyThemeFile(path), 600);
     });
 });
 
