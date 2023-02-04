@@ -41,6 +41,7 @@ export interface Plugin {
     components?: ComponentHook[];
     start?: () => void;
     stop?: () => void;
+    beforeBootstrap?: () => void;
     settings?: DefinedSettings;
 }
 
@@ -130,6 +131,11 @@ function applyPatches(src: string): string {
         initialiseSettings(plugin);
         if (!Settings.plugins[plugin.name].enabled)
             continue;
+
+        if (plugin.beforeBootstrap) {
+            Log.log("Patcher", "Calling pre-bootstrap hook from", plugin.name);
+            plugin.beforeBootstrap();
+        }
 
         if (plugin.patches?.length)
             Log.log("Patcher", "Applying patches from", plugin.name);

@@ -47,7 +47,7 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
         },
         set(target, prop: Extract<keyof T, string>, value) {
             target[prop] = value;
-            QuartetBeryl.ipc.send(IpcChannel.SET_SETTINGS, JSON.stringify(root));
+            QuartetBeryl.ipc.send(IpcChannel.SET_SETTINGS, JSON.stringify(root, null, 4));
             return true;
         },
     });

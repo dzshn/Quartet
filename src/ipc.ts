@@ -16,8 +16,8 @@ export function readSettingsSync() {
 
 export function writeSettingsSync(data: string) {
     mkdirSync(DATA_DIR, { recursive: true });
-    return writeFileSync(SETTINGS_PATH, data);
+    writeFileSync(SETTINGS_PATH, data);
 }
 
 ipcMain.on(IpcChannel.GET_SETTINGS, event => event.returnValue = readSettingsSync());
-ipcMain.on(IpcChannel.SET_SETTINGS, (event, data: string) => event.returnValue = writeSettingsSync(data));
+ipcMain.on(IpcChannel.SET_SETTINGS, (_, data: string) => writeSettingsSync(data));

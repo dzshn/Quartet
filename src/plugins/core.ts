@@ -75,7 +75,7 @@ export default {
         { component: QuartetConfigMenu, target: "tail", at: "#menus" },
     ],
 
-    start() {
+    beforeBootstrap() {
         if (!QUARTET_USERSCRIPT && settings.data.anonymiseFingerprint)
             Object.defineProperty(navigator, "userAgent", {
                 get: () => anonymousUA,
