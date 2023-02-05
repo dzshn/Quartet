@@ -1,11 +1,11 @@
 {
     "name": "quartet",
     "version": "0.1.0",
-    "description": "Cute TETR.IO client mod",
+    "description": "A cute and minimal TETR.IO client mod",
     "keywords": [],
-    "homepage": "https://github.com/dzshn/quartet",
+    "homepage": "https://github.com/dzshn/Quartet",
     "bugs": {
-        "url": "https://github.com/dzshn/quartet/issues"
+        "url": "https://github.com/dzshn/Quartet/issues"
     },
     "license": "GPL-3.0",
     "author": "dzshn",
@@ -15,7 +15,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/quartet"
+        "url": "https://github.com/Quartet"
     },
     "scripts": {
         "lint": "eslint src --ext .js,.ts,.svelte",
