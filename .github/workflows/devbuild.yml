@@ -74,7 +74,7 @@ jobs:
 
             - if: ${{ matrix.os == 'ubuntu-latest' }}
               name: Install libcurl
-              run: apt install libcurl3
+              run: sudo apt install libcurl3
 
             - name: Build patcher
               run: dub build --root=patcher -b release
