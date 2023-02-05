@@ -3,7 +3,7 @@ import core.stdc.stdlib : exit;
 
 import std.algorithm : among, either;
 import std.exception : enforce, ifThrown;
-import std.file : exists, FileException, getcwd, isDir, mkdir;
+import std.file : exists, FileException, getcwd, isDir, mkdirRecurse;
 import std.format : format;
 import std.getopt : getopt, GetOptException;
 import std.path : buildNormalizedPath, buildPath;
@@ -140,11 +140,12 @@ void main(string[] args) {
             writeln("Using ../dist");
             quartetPath = localQuartet;
         } else {
-            if (!quartetPath)
-                quartetPath = resources.buildPath("quartet");
+            quartetPath = either(quartetPath, getInstallPath(), explode("no appropriate install path", null));
 
-            if (!quartetPath.exists)
-                quartetPath.mkdir();
+            if (!quartetPath.exists) {
+                quartetPath.mkdirRecurse();
+                quartetPath.fixPerms();
+            }
 
             if (!noDownload) {
                 try

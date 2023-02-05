@@ -2,11 +2,13 @@ import etc.c.curl :
     curl_easy_init, curl_easy_cleanup, curl_easy_setopt, curl_easy_strerror, curl_easy_perform,
     CurlOption, CurlError;
 
-import std.conv : to;
-import std.file : exists, mkdir, rename, remove, rmdirRecurse;
+import std.algorithm : either;
+import std.conv : octal, to;
+import std.exception : enforce;
+import std.file : exists, getAttributes, mkdir, rename, remove, rmdirRecurse, setAttributes;
 import std.format : format;
 import std.json : JSONOptions, JSONValue, toJSON;
-import std.path : buildPath;
+import std.path : buildPath, expandTilde;
 import std.stdio : File, toFile, writeln;
 import std.string : toStringz;
 import std.process : environment;
@@ -29,7 +31,10 @@ void downloadQuartet(const string path) {
         if (fpath.exists)
             fpath.remove();
 
-        auto file = File(path.buildPath(filename), "w");
+        auto file = File(fpath, "w");
+        version (Posix) {
+            fpath.fixPerms();
+        }
         writeln("Downloading ", filename, " to ", path);
         curl.easy_setopt(CurlOption.url, (DEVBUILD_DOWNLOAD ~ "/" ~ filename).toStringz);
         curl.easy_setopt(CurlOption.file, file.getFP);
@@ -38,6 +43,42 @@ void downloadQuartet(const string path) {
         if (res != CurlError.ok)
             throw new Exception("could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
     }}
+}
+
+
+void fixPerms(const string path) {
+    import core.sys.posix.unistd : chown;
+    import core.sys.posix.pwd : getpwnam;
+
+    auto realUser = getRealUser;
+    enforce(realUser, path.format!"Can't fix permissions for %s. Please use either doas or sudo!");
+
+    auto userpwd = getpwnam(realUser.toStringz);
+
+    chown(path.toStringz, userpwd.pw_uid, userpwd.pw_gid);
+}
+
+
+string getRealUser() {
+    return either(environment.get("DOAS_USER"), environment.get("SUDO_USER"));
+}
+
+
+string getInstallPath() {
+    version (Windows) {
+        auto base = environment.get("LOCALAPPDATA");
+    } else version (OSX) {
+        auto base = "~/Library/Application Support/Quartet/build".expandTilde;
+    } else version (Posix) {
+        auto realUser = getRealUser();
+        if (!realUser)
+            return null;
+        auto base = environment.get("XDG_DATA_HOME", "~" ~ realUser ~ "/.local/share").expandTilde;
+    } else {
+        return null;
+    }
+
+    return base.buildPath("Quartet", "build");
 }
 
 
@@ -93,7 +134,7 @@ void patchAsar(const string resources, const string bundle) {
     packageJson
         .toFile(asar.buildPath("package.json"));
     JSONValue(bundle)
-        .toString(JSONOptions.doNotEscapeSlashes)
+        .toString(JSONOptions.doNotEscapeSlashes) // why is that not default?
         .format!"require(%s)"
         .toFile(asar.buildPath("main.js"));
 }
