@@ -20,10 +20,16 @@ import { Log } from "@api";
 import { anonymousUA } from "@api/constants";
 import { Settings } from "@api/settings";
 import { contextBridge, webFrame } from "electron";
-import { mkdir, readdir, readFile, readFileSync, stat, watch } from "fs";
+import fs, { readFileSync, watch } from "fs";
 import { join } from "path";
 import QuartetBeryl from "QuartetBeryl";
 import { DataDir, IpcChannel } from "types";
+import { promisify } from "util";
+
+const mkdir = promisify(fs.mkdir);
+const readdir = promisify(fs.readdir);
+const readFile = promisify(fs.readFile);
+const stat = promisify(fs.stat);
 
 contextBridge.exposeInMainWorld("QuartetBeryl", QuartetBeryl);
 
@@ -45,61 +51,58 @@ if (settings.Quartet?.anonymiseFingerprint)
 
 const themeKeys: Record<string, string> = {};
 
-function applyThemeFile(path: string) {
-    Log.log("CSS", `applying ${path}`);
-
+async function applyThemeFile(path: string) {
     const key = themeKeys[path];
     if (key)
         webFrame.removeInsertedCSS(key);
 
-    readFile(path, { encoding: "utf-8" }, (err, css) => {
-        if (err) {
-            Log.error("CSS", `error applying ${path}: ${err}`);
-            return;
-        }
+    Log.log("CSS", key ? `Reapplying ${path}` : `Applying ${path}`);
 
-        themeKeys[path] = webFrame.insertCSS(css);
-    });
+    try {
+        themeKeys[path] = webFrame.insertCSS(
+            await readFile(path, { encoding: "utf-8" })
+        );
+    } catch (err) {
+        Log.error("CSS", `Error applying ${path}`, err);
+    }
 }
 
-mkdir(themesDir, { recursive: true }, () => {
-    readdir(themesDir, (err, files) => {
-        if (err) {
-            Log.error("CSS", "error reading themes directory", err);
-            return;
+(async () => {
+    try {
+        await mkdir(themesDir, { recursive: true });
+        for (const filename of await readdir(themesDir)) {
+            if (filename.startsWith(".") || !filename.endsWith(".css"))
+                continue;
+
+            await applyThemeFile(join(themesDir, filename));
         }
 
-        files.forEach(filename => {
-            if (filename.startsWith(".") || !filename.endsWith(".css"))
+        const fileTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+
+        watch(themesDir, { persistent: false }, async (event, filename) => {
+            const path = join(themesDir, filename);
+            if (!filename || filename.startsWith(".") || !filename.endsWith(".css"))
                 return;
 
-            applyThemeFile(join(themesDir, filename));
-        });
-    });
-
-    const fileTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
-
-    watch(themesDir, { persistent: false }, (event, filename) => {
-        const path = join(themesDir, filename);
-        if (!filename || filename.startsWith(".") || !filename.endsWith(".css"))
-            return;
-
-        if (event === "rename") {
-            stat(path, err => {
-                if (err) {
+            if (event === "rename") {
+                try {
+                    await stat(path);
+                } catch (err) {
                     Log.log("CSS", `unloading ${path} (file deleted)`);
                     const key = themeKeys[path];
                     if (key)
                         webFrame.removeInsertedCSS(key);
                 }
-            });
-            return;
-        }
+                return;
+            }
 
-        // Debounce theme updates
-        clearTimeout(fileTimeouts[filename]);
-        fileTimeouts[filename] = setTimeout(() => applyThemeFile(path), 600);
-    });
-});
+            // Debounce theme updates
+            clearTimeout(fileTimeouts[filename]);
+            fileTimeouts[filename] = setTimeout(() => applyThemeFile(path), 600);
+        });
+    } catch (err) {
+        Log.error("CSS", err);
+    }
+})();
 
 webFrame.executeJavaScript(readFileSync(join(__dirname, "quartet.js"), "utf-8"));
