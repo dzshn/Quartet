@@ -3,7 +3,7 @@ import core.stdc.stdlib : exit;
 
 import std.algorithm : among, either;
 import std.exception : enforce, ifThrown;
-import std.file : exists, FileException, getcwd, isDir;
+import std.file : exists, FileException, getcwd, isDir, mkdir;
 import std.format : format;
 import std.getopt : getopt, GetOptException;
 import std.path : buildNormalizedPath, buildPath;
@@ -52,27 +52,39 @@ noreturn explode(const string msg, const string hint = "Try running --help\n    
 
 
 void main(string[] args) {
+    string quartetPath;
     bool patch;
     bool unpatch;
     auto helpInformation = getopt(
         args,
         "patch", "Patch install without prompting", &patch,
         "unpatch", "Unpatch install without prompting", &unpatch,
-        "repatch", "Re-patch an install", { patch = true; unpatch = true; },
+        "repatch", "Unpatch then patch an install without prompting", { patch = true; unpatch = true; },
+        "path", "Specify where Quartet will be downloaded to, or is already present", &quartetPath,
     ).ifThrown!GetOptException(e => explode(e.msg));
 
     if (helpInformation.helpWanted) {
         writeln(YELLOW, "usage:");
-        writeln("    ", BLUE, "qpatcher", CYAN, " [options] <TETR.IO path>");
+        writeln("    ", BLUE, "qpatcher", CYAN, " [options] [TETR.IO path]", RESET);
+        writeln();
+        writeln("    If no path is provided, qpatcher will try common paths and fallback to");
+        writeln("    prompting. On some platforms, you might need to run this as root (admin)");
+        writeln();
+        writeln("    More info can be found at: https://github.com/dzshn/Quartet");
         writeln();
         writeln(YELLOW, "flags:");
         foreach (opt; helpInformation.options) {
             string fmt = "";
             if (opt.optShort)
-                fmt ~= opt.optShort ~ ", ";
+                fmt ~= opt.optShort;
+            if (opt.optShort && opt.optLong)
+                fmt ~= ", ";
             if (opt.optLong)
                 fmt ~= opt.optLong;
-            writeln("    ", BLUE, fmt.leftJustify(15), " ", CYAN, opt.help);
+            auto help = opt.help;
+            if (opt.optLong == "--help")
+                help = "Print this message and quit";
+            writeln("    ", BLUE, fmt.leftJustify(15), " ", CYAN, help);
         }
         return;
     }
@@ -92,13 +104,13 @@ void main(string[] args) {
 
     if (!patch && !unpatch) {
         if (isPatched) {
-            write(YELLOW, "Unpatch", CYAN, " install?", RESET, " [y/N] ");
+            write(CYAN, "Unpatch install?", RESET, " [y/N] ");
             if (!readln().strip().among("y", "yes"))
                 writeln(RED, "Aborted.", RESET), exit(0);
             unpatch = true;
         } else {
-            write(YELLOW, "Patch", CYAN, " install?", RESET, " [y/N] ");
-            if (!readln().strip().among("y", "yes"))
+            write(CYAN, "Patch install?", RESET, " [Y/n] ");
+            if (!readln().strip().among("y", "yes", ""))
                 writeln(RED, "Aborted.", RESET), exit(0);
             patch = true;
         }
@@ -119,8 +131,25 @@ void main(string[] args) {
         writeln(YELLOW, "Quartet uninstalled!", RESET);
     }
     if (patch) {
+        const localQuartet = getcwd().buildNormalizedPath("..", "dist");
+        if (!quartetPath && localQuartet.exists) {
+            writeln("Using ../dist");
+            quartetPath = localQuartet;
+        } else {
+            if (!quartetPath)
+                quartetPath = resources.buildPath("quartet");
+
+            if (!quartetPath.exists)
+                quartetPath.mkdir();
+
+            try
+                downloadQuartet(quartetPath);
+            catch (Exception e)
+                explode(e.msg, null);
+        }
+
         try
-            patchAsar(resources, getcwd().buildNormalizedPath("..", "dist", "loader.js"));
+            patchAsar(resources, quartetPath.buildPath("loader.js"));
         catch (FileException e)
             explode(e.msg, e.errno == EACCES ? "run as root!" : null);
 
