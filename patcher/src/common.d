@@ -29,7 +29,7 @@ void downloadQuartet(const string path) {
         if (fpath.exists)
             fpath.remove();
 
-        auto file = File(path.buildPath(filename ~ "~"), "w");
+        auto file = File(path.buildPath(filename), "w");
         writeln("Downloading ", filename, " to ", path);
         curl.easy_setopt(CurlOption.url, (DEVBUILD_DOWNLOAD ~ "/" ~ filename).toStringz);
         curl.easy_setopt(CurlOption.file, file.getFP);
