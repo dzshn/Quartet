@@ -55,12 +55,16 @@ void main(string[] args) {
     string quartetPath;
     bool patch;
     bool unpatch;
+    bool noDownload;
+    bool noLocal;
     auto helpInformation = getopt(
         args,
         "patch", "Patch install without prompting", &patch,
         "unpatch", "Unpatch install without prompting", &unpatch,
         "repatch", "Unpatch then patch an install without prompting", { patch = true; unpatch = true; },
         "path", "Specify where Quartet will be downloaded to, or is already present", &quartetPath,
+        "no-download", "Don't download anything", &noDownload,
+        "no-local", "Don't use local dev build (../dist)", &noLocal,
     ).ifThrown!GetOptException(e => explode(e.msg));
 
     if (helpInformation.helpWanted) {
@@ -132,7 +136,7 @@ void main(string[] args) {
     }
     if (patch) {
         const localQuartet = getcwd().buildNormalizedPath("..", "dist");
-        if (!quartetPath && localQuartet.exists) {
+        if (!noLocal && !quartetPath && localQuartet.exists) {
             writeln("Using ../dist");
             quartetPath = localQuartet;
         } else {
@@ -142,10 +146,12 @@ void main(string[] args) {
             if (!quartetPath.exists)
                 quartetPath.mkdir();
 
-            try
-                downloadQuartet(quartetPath);
-            catch (Exception e)
-                explode(e.msg, null);
+            if (!noDownload) {
+                try
+                    downloadQuartet(quartetPath);
+                catch (Exception e)
+                    explode(e.msg, null);
+            }
         }
 
         try

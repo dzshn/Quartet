@@ -3,7 +3,7 @@ import etc.c.curl :
     CurlOption, CurlError;
 
 import std.conv : to;
-import std.file : exists, mkdir, rename, rmdirRecurse;
+import std.file : exists, mkdir, rename, remove, rmdirRecurse;
 import std.format : format;
 import std.json : JSONOptions, JSONValue, toJSON;
 import std.path : buildPath;
@@ -24,18 +24,20 @@ void downloadQuartet(const string path) {
         throw new Error("could not initialise curl");
     scope (exit) curl.easy_cleanup();
 
-    static foreach (filename; ["loader.js", "preload.js", "quartet.js"]) {
-        if (!path.buildPath(filename).exists) {
-            auto file = File(path.buildPath(filename), "w");
-            writeln("Downloading ", filename, " to ", path);
-            curl.easy_setopt(CurlOption.url, (DEVBUILD_DOWNLOAD ~ "/" ~ filename).toStringz);
-            curl.easy_setopt(CurlOption.file, file.getFP);
-            curl.easy_setopt(CurlOption.followlocation, true);
-            auto res = curl.easy_perform();
-            if (res != CurlError.ok)
-                throw new Exception("could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
-        }
-    }
+    static foreach (filename; ["loader.js", "preload.js", "quartet.js"]) {{
+        const fpath = path.buildPath(filename);
+        if (fpath.exists)
+            fpath.remove();
+
+        auto file = File(path.buildPath(filename ~ "~"), "w");
+        writeln("Downloading ", filename, " to ", path);
+        curl.easy_setopt(CurlOption.url, (DEVBUILD_DOWNLOAD ~ "/" ~ filename).toStringz);
+        curl.easy_setopt(CurlOption.file, file.getFP);
+        curl.easy_setopt(CurlOption.followlocation, true);
+        auto res = curl.easy_perform();
+        if (res != CurlError.ok)
+            throw new Exception("could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
+    }}
 }
 
 
