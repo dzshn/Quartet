@@ -6,7 +6,6 @@
     "copyright": "Copyright (c) 2023 Sofia Lima",
     "license": "GPL-3.0",
     "targetType": "executable",
-    "libs": ["curl"],
     "configurations": [
         {
             "name": "cli",
