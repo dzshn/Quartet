@@ -12,5 +12,8 @@
             "name": "cli",
             "mainSourceFile": "src/cli.d"
         }
-    ]
+    ],
+		"dependencies": {
+        "requests": "~>2.0.9"
+    }
 }

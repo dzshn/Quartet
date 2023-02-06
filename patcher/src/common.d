@@ -1,6 +1,4 @@
-import etc.c.curl :
-    curl_easy_init, curl_easy_cleanup, curl_easy_setopt, curl_easy_strerror, curl_easy_perform,
-    CurlOption, CurlError;
+import requests : Request;
 
 import std.algorithm : either;
 import std.conv : octal, to;
@@ -9,38 +7,25 @@ import std.file : exists, getAttributes, mkdir, rename, remove, rmdirRecurse, se
 import std.format : format;
 import std.json : JSONOptions, JSONValue, toJSON;
 import std.path : buildPath, expandTilde;
-import std.stdio : File, toFile, writeln;
+import std.stdio : File, toFile, writeln, writefln;
 import std.string : toStringz;
 import std.process : environment;
 
 const DEVBUILD_DOWNLOAD = "https://github.com/dzshn/Quartet/releases/download/devbuild";
 
-alias easy_cleanup = curl_easy_cleanup;
-alias easy_perform = curl_easy_perform;
-alias easy_setopt = curl_easy_setopt;
-alias easy_strerror = curl_easy_strerror;
-
-void downloadQuartet(const string path) {
-    auto curl = curl_easy_init();
-    if (!curl)
-        throw new Error("could not initialise curl");
-    scope (exit) curl.easy_cleanup();
+void downloadQuartet(const string installPath) {
+    auto rq = Request();
 
     static foreach (filename; ["loader.js", "preload.js", "quartet.js"]) {{
-        const fpath = path.buildPath(filename);
-        if (fpath.exists)
-            fpath.remove();
+        const filePath = installPath.buildPath(filename);
+        if (filePath.exists)
+            filePath.remove();
 
-        auto file = File(fpath, "w");
-        version (Posix) {
-            fpath.fixPerms();
-        }
-        writeln("Downloading ", filename, " to ", path);
-        curl.easy_setopt(CurlOption.url, (DEVBUILD_DOWNLOAD ~ "/" ~ filename).toStringz);
-        curl.easy_setopt(CurlOption.file, file.getFP);
-        curl.easy_setopt(CurlOption.followlocation, true);
-        auto res = curl.easy_perform();
-        enforce(res == CurlError.ok, "could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
+        writeln("Downloading ", filename, " to ", installPath);
+        auto res = rq.get(DEVBUILD_DOWNLOAD ~ "/" ~ filename);
+        enforce(res.code == 200, format!"failed to download %s"(filename));
+        File(filePath, "wb").rawWrite(res.responseBody.data);
+        version (Posix) filePath.fixPerms();
     }}
 }
 

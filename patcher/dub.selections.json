@@ -1,6 +1,11 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"gtk-d": "3.10.0"
+		"automem": "0.6.8",
+		"cachetools": "0.4.1",
+		"gtk-d": "3.10.0",
+		"requests": "2.0.9",
+		"test_allocator": "0.3.3",
+		"unit-threaded": "0.10.8"
 	}
 }
