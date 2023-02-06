@@ -1,10 +1,7 @@
-use std::{
-    env,
-    path::{Path, PathBuf},
-    vec,
-};
+use std::{env, path::PathBuf, vec};
 
-use nix::unistd::User;
+#[cfg(target_os = "linux")]
+use {nix::unistd::User, std::path::Path};
 
 #[macro_export]
 macro_rules! path {
@@ -16,12 +13,12 @@ macro_rules! path {
     };
 }
 
-#[cfg(all(target_family = "unix", not(target_os = "macos")))]
+#[cfg(target_os = "linux")]
 fn expand_tilde(path: &str) -> PathBuf {
     path.strip_prefix("~/")
         .map_or(path!(path), |p| get_real_user().dir.join(p))
 }
-#[cfg(target_family = "macos")]
+#[cfg(target_os = "macos")]
 fn expand_tilde(path: &str) -> PathBuf {
     path.strip_prefix("~/").map_or(path!(path), |p| {
         let home = env::var("HOME").expect("HOME not set");
@@ -29,6 +26,7 @@ fn expand_tilde(path: &str) -> PathBuf {
     })
 }
 
+#[cfg(target_os = "linux")]
 pub fn get_real_user() -> User {
     let doas_user = env::var("DOAS_USER");
     let sudo_user = env::var("SUDO_USER");
@@ -42,41 +40,52 @@ pub fn get_real_user() -> User {
     }
 }
 
+#[cfg(target_os = "windows")]
 pub fn get_install_path() -> Option<PathBuf> {
-    if cfg!(windows) {
-        env::var("LOCALAPPDATA").ok().map(|path| path.into())
-    } else if cfg!(macos) {
-        Some(expand_tilde("~/Library/Application Support"))
-    } else if cfg!(unix) {
-        Some(expand_tilde("~/.local/share"))
-    } else {
-        None
-    }
-    .map(|path| path!(&path, "Quartet/build"))
+    env::var("LOCALAPPDATA")
+        .ok()
+        .map(|path| path!(&path, "Quartet/build"))
 }
 
+#[cfg(target_os = "linux")]
+pub fn get_install_path() -> Option<PathBuf> {
+    Some(expand_tilde("~/.local/share/Quartet/build"))
+}
+
+#[cfg(target_os = "macos")]
+pub fn get_install_path() -> Option<PathBuf> {
+    Some(expand_tilde("~/Library/Application Support/Quartet/build"))
+}
+
+#[cfg(target_os = "windows")]
 pub fn guess_path() -> Option<PathBuf> {
-    // TODO: find more
-    let mut paths: Vec<PathBuf> = vec![];
-    if cfg!(windows) {
-        let local_app_data = env::var("LOCALAPPDATA").expect("LOCALAPPDATA not set");
-        paths.push(path!(&local_app_data, "Programs/tetrio-desktop"));
-    } else if cfg!(macos) {
-        paths.push(expand_tilde("~/Applications/TETR.IO"));
-    } else if cfg!(unix) {
-        paths.push(path!("/opt/TETR.IO"));
-    }
-    paths
+    let local_app_data = env::var("LOCALAPPDATA").expect("LOCALAPPDATA not set");
+    vec![path!(&local_app_data, "Programs/tetrio-desktop")]
         .iter()
         .find(|path| path.exists())
-        .map(|path| path.to_path_buf())
+        .cloned()
 }
 
-#[cfg(target_family = "unix")]
+#[cfg(target_os = "linux")]
+pub fn guess_path() -> Option<PathBuf> {
+    vec![path!("/opt/TETR.IO")]
+        .iter()
+        .find(|path| path.exists())
+        .cloned()
+}
+
+#[cfg(target_os = "macos")]
+pub fn guess_path() -> Option<PathBuf> {
+    vec![expand_tilde("~/Applications/TETR.IO")]
+        .iter()
+        .find(|path| path.exists())
+        .cloned()
+}
+
+#[cfg(target_os = "linux")]
 pub fn fix_perms(path: &Path) {
-    use nix::unistd::chown;
     let user = get_real_user();
-    match chown(path, Some(user.uid), Some(user.gid)) {
+    match nix::unistd::chown(path, Some(user.uid), Some(user.gid)) {
         Ok(_) => (),
         Err(e) => panic!("Can't change permissions for {}: {e}", path.display()),
     }
