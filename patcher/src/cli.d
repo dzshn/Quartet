@@ -144,7 +144,9 @@ void main(string[] args) {
 
             if (!quartetPath.exists) {
                 quartetPath.mkdirRecurse();
-                quartetPath.fixPerms();
+                version (Posix) {
+                    quartetPath.fixPerms();
+                }
             }
 
             if (!noDownload) {

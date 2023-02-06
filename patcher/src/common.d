@@ -40,13 +40,12 @@ void downloadQuartet(const string path) {
         curl.easy_setopt(CurlOption.file, file.getFP);
         curl.easy_setopt(CurlOption.followlocation, true);
         auto res = curl.easy_perform();
-        if (res != CurlError.ok)
-            throw new Exception("could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
+        enforce(res == CurlError.ok, "could not download " ~ filename ~ ": " ~ res.easy_strerror.to!string);
     }}
 }
 
 
-void fixPerms(const string path) {
+version (Posix) void fixPerms(const string path) {
     import core.sys.posix.unistd : chown;
     import core.sys.posix.pwd : getpwnam;
 
