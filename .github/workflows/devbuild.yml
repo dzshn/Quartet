@@ -81,6 +81,7 @@ jobs:
 
             - name: Test with clippy
               run: cargo clippy
+              working-directory: ./qpatcher
 
             - name: Build patcher
               run: cargo build --release
