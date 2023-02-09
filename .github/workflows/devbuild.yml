@@ -47,7 +47,7 @@ jobs:
               run: |
                   echo "release_tag=$(jq .version package.json -r) ($(git rev-parse --short HEAD))" >> $GITHUB_ENV
 
-            - name: Upload dev release
+            - name: Upload devbuild
               run: |
                   gh release upload devbuild --clobber dist/*
                   gh release edit devbuild --title "Quartet INDEV $RELEASE_TAG"
@@ -55,7 +55,7 @@ jobs:
                   RELEASE_TAG: ${{ env.release_tag }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    build-d:
+    build-rust:
         strategy:
             fail-fast: false
             matrix:
@@ -64,30 +64,26 @@ jobs:
         runs-on: ${{ matrix.os }}
         defaults:
             run:
+                # PowerShell will explod
                 shell: bash
+                working-directory: ./qpatcher
+
         steps:
             - uses: actions/checkout@v3
 
-            - uses: dlang-community/setup-dlang@v1
-              with:
-                  compiler: ldc-latest
-
-            - if: ${{ matrix.os == 'ubuntu-latest' }}
-              name: Install libcurl
-              run: sudo apt install libcurl4-openssl-dev
+            - name: Test with clippy
+              run: cargo clippy
 
             - name: Build patcher
-              run: dub build --root=patcher -b release
-
-            - run: ls . patcher
-
-            - if: ${{ matrix.os == 'windows-latest' }}
-              run: mv patcher/qpatcher.exe qpatcher-cli-windows.exe
+              run: cargo build --release
 
             - if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: mv patcher/qpatcher qpatcher-cli-linux
+              run: mv target/release/qpatcher qpatcher-cli-linux
 
-            - name: Upload dev release
+            - if: ${{ matrix.os == 'windows-latest' }}
+              run: mv target/release/qpatcher.exe qpatcher-cli-windows.exe
+
+            - name: Upload devbuild
               run: gh release upload devbuild --clobber qpatcher-*
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
