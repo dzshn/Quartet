@@ -3,13 +3,13 @@ use std::{fs, path::PathBuf};
 
 use ureq;
 
-const DEVBUILD_URL: &str = "https://github.com/dzshn/Quartet/releases/devbuild";
+const DEVBUILD_URL: &str = "https://github.com/dzshn/Quartet/releases/download/devbuild";
 
 pub fn download_quartet(install_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     let agent = ureq::agent();
     for filename in ["loader.js", "preload.js", "quartet.js"] {
         let file_path = path!(install_path, filename);
-        let url = DEVBUILD_URL.to_owned() + filename;
+        let url = DEVBUILD_URL.to_owned() + "/" + filename;
 
         println!("Downloading {} to {}", filename, install_path.display());
         // into_string is okay since we expect less than a mb of data
