@@ -224,21 +224,19 @@ fn main() {
     }
 
     if is_patched && !unpatch {
-        explode!("Already patched!", "");
+        explode!("Already patched!");
     }
     if !is_patched && unpatch {
-        explode!("Nothing to unpatch!", "");
+        explode!("Nothing to unpatch!");
     }
 
     if unpatch {
         match unpatch_asar(&resources) {
             Ok(()) => cprintln!([yellow "Quartet uninstalled!"]),
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
-                explode!(format!("{:?}", e).as_str(), "run as root!");
+                explode!(format!("{:?}", e).as_str(), "run as root!")
             }
-            Err(e) => {
-                explode!(format!("{:?}", e).as_str(), "");
-            }
+            Err(e) => explode!(format!("{:?}", e).as_str()),
         }
     }
     if patch {
@@ -254,9 +252,7 @@ fn main() {
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
                 explode!(format!("{e:?}").as_str(), "run as root!");
             }
-            Err(e) => {
-                explode!(format!("{e:?}").as_str(), "");
-            }
+            Err(e) => explode!(format!("{e:?}").as_str()),
         }
     }
 }
