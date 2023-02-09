@@ -55,7 +55,10 @@ pub fn patch_asar(resources: &PathBuf, bundle: &Path) -> std::io::Result<()> {
     fs::rename(&asar, original_asar)?;
     fs::create_dir(&asar)?;
     fs::write(asar.join("package.json"), package_json)?;
-    fs::write(asar.join("main.js"), format!("require({bundle_string})"))?;
+    fs::write(
+        asar.join("main.js"),
+        format!("require(\"{bundle_string}\")"),
+    )?;
     Ok(())
 }
 
