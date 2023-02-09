@@ -5,7 +5,7 @@ on:
             - .github/workflows/devbuild.yml
             - src/**
             - scripts/**
-            - patcher/**
+            - qpatcher/**
             - package.json
             - pnpm-lock.yaml
 
@@ -64,22 +64,33 @@ jobs:
             run:
                 # PowerShell will explod
                 shell: bash
-                working-directory: ./qpatcher
 
         steps:
             - uses: actions/checkout@v3
+
+            - uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.cargo/bin
+                      ~/.cargo/registry/index
+                      ~/.cargo/registry/cache
+                      ~/.cargo/git/db
+                      qpatcher/target
+
+                  key: rusty-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Test with clippy
               run: cargo clippy
 
             - name: Build patcher
               run: cargo build --release
+              working-directory: ./qpatcher
 
             - if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: mv target/release/qpatcher qpatcher-cli-linux
+              run: mv qpatcher/target/release/qpatcher qpatcher-cli-linux
 
             - if: ${{ matrix.os == 'windows-latest' }}
-              run: mv target/release/qpatcher.exe qpatcher-cli-windows.exe
+              run: mv qpatcher/target/release/qpatcher.exe qpatcher-cli-windows.exe
 
             - name: Upload devbuild
               run: gh release upload devbuild --clobber qpatcher-*
