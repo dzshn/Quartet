@@ -1,7 +1,8 @@
 use crate::{path, paths::fix_perms};
-use std::{fs, path::PathBuf};
-
-use ureq;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 const DEVBUILD_URL: &str = "https://github.com/dzshn/Quartet/releases/download/devbuild";
 
@@ -38,15 +39,15 @@ pub fn unpatch_asar(resources: &PathBuf) -> std::io::Result<()> {
     }
 }
 
-pub fn patch_asar(resources: &PathBuf, bundle: &PathBuf) -> std::io::Result<()> {
+pub fn patch_asar(resources: &PathBuf, bundle: &Path) -> std::io::Result<()> {
     let package_json = r#"{"name": "tetrio-desktop", "main": "main.js"}"#;
     let asar = path!(&resources, "app.asar");
     let original_asar = path!(&resources, "_app.asar");
     let bundle_string = bundle
         .to_str()
         .expect("Invalid path string")
-        .replace(r#"\"#, r#"\\"#)
-        .replace(r#"""#, r#"\""#);
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"");
 
     fs::rename(&asar, original_asar)?;
     fs::create_dir(&asar)?;

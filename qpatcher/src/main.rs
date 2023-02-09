@@ -66,7 +66,7 @@ macro_rules! explode {
     ($msg:expr, $hint:expr) => {
         print!("{}", colored("%red%Error: %reset%"));
         println!("{}", colored($msg));
-        if $hint.len() > 0 {
+        if !$hint.is_empty() {
             print!("{}", colored("%blue%Hint: %reset%"));
             println!("{}", colored($hint));
         }
@@ -103,7 +103,7 @@ fn ask(prompt: &str) -> String {
     print!("{}", colored(prompt));
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut res).expect("j");
-    if res.len() == 0 {
+    if res.is_empty() {
         // EOF
         println!("^D");
         exit(0);
@@ -229,8 +229,8 @@ fn main() {
         if download {
             fs::create_dir_all(quartet_path).unwrap();
             #[cfg(target_os = "linux")]
-            fix_perms(&quartet_path);
-            download_quartet(&quartet_path).unwrap();
+            fix_perms(quartet_path);
+            download_quartet(quartet_path).unwrap();
         }
 
         match patch_asar(&resources, &path!(quartet_path, "loader.js")) {
