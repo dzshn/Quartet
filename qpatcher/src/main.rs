@@ -2,14 +2,14 @@ mod patcher;
 mod paths;
 
 use std::{
-    fs,
+    env, fs,
     io::{self, Write},
     path::PathBuf,
     process::exit,
 };
 
 use clap::{arg, command, value_parser, Arg, ArgAction};
-use is_terminal::IsTerminal;
+use owo_colors::{Style, StyledList};
 use patcher::{check_patched, download_quartet, patch_asar};
 use paths::{get_install_path, guess_path};
 
@@ -17,36 +17,61 @@ use crate::patcher::unpatch_asar;
 #[cfg(target_os = "linux")]
 use crate::paths::fix_perms;
 
-const HELP_TEMPLATE: &str = "\
-%blue%{name} %cyan%{version}%reset%
-Justice Almanzar; Sofia Lima
-
-%yellow%usage:%reset%
-    If no path is provided, qpatcher will try common paths and fallback to
-    prompting. On some platforms, when using a system package manager, you
-    might need to run this as root with doas or sudo.
-
-    %blue%More info can be found at: %cyan%https://github.com/dzshn/Quartet%reset%
-
-%yellow%flags:%reset%
-{options}
-";
-
-macro_rules! sgr {
-    ($c:expr) => {
-        concat!("\x1b[", stringify!($c), "m")
+macro_rules! colored {
+    ([$color:ident $text:expr]) => {
+        Style::new().$color().style($text)
+    };
+    ($text:literal) => {
+        Style::new().style($text)
+    };
+    ($($text:tt)*) => {
+        if do_color() {
+            StyledList::from([
+                $(colored!($text),)*
+            ])
+        } else {
+            todo!()
+        }
     };
 }
 
-macro_rules! interpolate {
-    ($base:expr, $( $a:ident = $b:expr ),*) => {
-        $base$(.replace(concat!("%", stringify!($a), "%"), $b))*
+macro_rules! cprint {
+    ($($text:tt)*) => {
+        print!("{}", colored!($($text)*))
     };
+}
+
+macro_rules! cprintln {
+    ($($text:tt)*) => {
+        println!("{}", colored!($($text)*))
+    };
+}
+
+macro_rules! ask {
+    ($($prompt:tt)*) => {{
+        let mut res = String::new();
+        cprint!($($prompt)*);
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut res).unwrap();
+        if res.is_empty() {
+            // EOF
+            println!("^D");
+            exit(0);
+        }
+        res.truncate(res.trim_end().len());
+        res
+    }};
 }
 
 macro_rules! confirm {
-    ($q:expr, $default:expr) => {
-        match ask($q).as_str() {
+    (Y $q:literal) => {
+        confirm!(true, [cyan $q] " [Y/n]")
+    };
+    (N $q:literal) => {
+        confirm!(false, [cyan $q] " [y/N]")
+    };
+    ($default:expr, $($q:tt)*) => {
+        match ask!($($q)*).as_str() {
             "y" | "yes" => true,
             "n" | "no" => false,
             _ => $default,
@@ -56,75 +81,60 @@ macro_rules! confirm {
 
 macro_rules! explode {
     ($msg:expr) => {
-        explode!($msg, "Try running --help\n%yellow%usage: %blue%qpatcher %cyan%[options] <TETR.IO path>%reset%");
+        {
+            cprint!([red "Error: "]);
+            println!("{}", $msg);
+            exit(0)
+        }
     };
     ($msg:expr, $hint:expr) => {
-        print!("{}", colored("%red%Error: %reset%"));
-        println!("{}", colored($msg));
-        if !$hint.is_empty() {
-            print!("{}", colored("%blue%Hint: %reset%"));
-            println!("{}", colored($hint));
+        {
+            cprint!([red "Error: "]);
+            println!("{}", $msg);
+            cprint!([blue "Hint: "]);
+            println!("{}", $hint);
+            exit(0)
         }
-        exit(0);
     };
 }
 
-fn colored(text: &str) -> String {
-    if io::stdout().is_terminal() {
-        interpolate!(
-            text,
-            red = sgr!(31),
-            green = sgr!(32),
-            yellow = sgr!(33),
-            blue = sgr!(34),
-            cyan = sgr!(36),
-            reset = sgr!(0)
-        )
-    } else {
-        interpolate!(
-            text,
-            red = "",
-            green = "",
-            yellow = "",
-            blue = "",
-            cyan = "",
-            reset = ""
-        )
-    }
-}
-
-fn ask(prompt: &str) -> String {
-    let mut res = String::new();
-    print!("{}", colored(prompt));
-    io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut res).expect("j");
-    if res.is_empty() {
-        // EOF
-        println!("^D");
-        exit(0);
-    }
-    res.truncate(res.trim_end().len());
-    res
+fn do_color() -> bool {
+    env::var("NO_COLOR").is_err()
+        && supports_color::on_cached(supports_color::Stream::Stdout)
+            .map(|support| support.has_basic)
+            .unwrap_or(false)
 }
 
 fn ask_path() -> PathBuf {
-    println!(
-        "{}",
-        colored("%yellow%Couldn't find TETR.IO path. Please enter manually%reset%")
-    );
+    cprintln!([yellow "Couldn't find TETR.IO path. Please enter manually"]);
 
     loop {
-        let path = path!(&ask("%blue%? %reset%"));
+        let path = path!(&ask!([blue "? "]));
         if path.exists() {
             return path;
         }
-        println!("{}", colored("%red%That path does not exist.%reset%"));
+        cprintln!([red "Inputted path does not exist."]);
     }
 }
 
 fn main() {
+    let help_template = colored!(
+        [blue "{name} "] [cyan "{version}\n"]
+        "Justice Almanzar; Sofia Lima\n\n"
+
+        [yellow "usage:\n"]
+        "    If no path is provided, qpatcher will try common paths and fallback to\n"
+        "    prompting. On some platforms, when using a system package manager, you\n"
+        "    might need to run this as root with doas or sudo.\n\n"
+
+        [blue "    More info can be found at: "] [cyan "https://github.com/dzshn/Quartet\n\n"]
+
+        [yellow "flags:\n"]
+        "{options}"
+    );
+
     let m = command!()
-        .help_template(colored(HELP_TEMPLATE))
+        .help_template(help_template.to_string())
         .disable_colored_help(true)
         .args([
             arg!(--patch "Patch install without prompting"),
@@ -144,6 +154,7 @@ fn main() {
                 .help("Don't use local build (../dist)"),
             Arg::new("tetrio_path")
                 .value_name("TETR.IO path")
+                .value_parser(value_parser!(PathBuf))
                 .help("Path to TETR.IO install"),
         ])
         .get_matches();
@@ -168,14 +179,24 @@ fn main() {
         &default_quartet_path
     });
 
-    let path = guess_path().unwrap_or_else(ask_path);
-    let resources = path!(&path, "resources");
+    let mut default_tetrio_path: PathBuf = Default::default();
+    let tetrio_path = m.get_one::<PathBuf>("tetrio_path").unwrap_or_else(|| {
+        default_tetrio_path = guess_path().unwrap_or_else(ask_path);
+        &default_tetrio_path
+    });
+    let resources = path!(&tetrio_path, "resources");
 
-    if !path.is_dir() {
-        explode!(&format!(
-            "path {} does not exist or is not a directory",
-            path.display()
-        ));
+    if !tetrio_path.is_dir() {
+        explode!(
+            &format!(
+                "path {} does not exist or is not a directory",
+                tetrio_path.display()
+            ),
+            colored!(
+                "Try running --help:\n"
+                [yellow "  usage: "] [blue "qpatcher "] [cyan "[options] [TETR.IO path]"]
+            )
+        );
     }
     if !resources.is_dir() {
         explode!(
@@ -188,14 +209,14 @@ fn main() {
 
     if !(patch || unpatch) {
         if is_patched {
-            if !confirm!("%cyan%Unpatch install? %reset%[y/N] ", false) {
-                println!("{}", colored("%red%Aborted.%reset%"));
+            if !confirm!(N "Unpatch install?") {
+                cprintln!([red "Aborted."]);
                 return;
             }
             unpatch = true;
         } else {
-            if !confirm!("%cyan%Patch install? %reset%[Y/n] ", true) {
-                println!("{}", colored("%red%Aborted.%reset%"));
+            if !confirm!(Y "Patch install?") {
+                cprintln!([red "Aborted."]);
                 return;
             }
             patch = true;
@@ -211,7 +232,7 @@ fn main() {
 
     if unpatch {
         match unpatch_asar(&resources) {
-            Ok(()) => println!("{}", colored("%yellow%Quartet uninstalled!%reset%")),
+            Ok(()) => cprintln!([yellow "Quartet uninstalled!"]),
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
                 explode!(format!("{:?}", e).as_str(), "run as root!");
             }
@@ -229,7 +250,7 @@ fn main() {
         }
 
         match patch_asar(&resources, &path!(quartet_path, "loader.js")) {
-            Ok(()) => println!("{}", colored("%yellow%Quartet installed!%reset%")),
+            Ok(()) => cprintln!([yellow "Quartet installed!"]),
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
                 explode!(format!("{e:?}").as_str(), "run as root!");
             }
