@@ -45,17 +45,12 @@ macro_rules! interpolate {
 }
 
 macro_rules! confirm {
-    ($q:expr, $pat:pat) => {
+    ($q:expr, $default:expr) => {
         match ask($q).as_str() {
-            $pat => true,
-            _ => false,
+            "y" | "yes" => true,
+            "n" | "no" => false,
+            _ => $default,
         }
-    };
-    (Y $q:expr) => {
-        confirm!($q, "y" | "yes" | "")
-    };
-    (N $q:expr) => {
-        confirm!($q, "y" | "yes")
     };
 }
 
@@ -193,13 +188,13 @@ fn main() {
 
     if !(patch || unpatch) {
         if is_patched {
-            if !confirm!(Y "%cyan%Unpatch install? %reset%[y/N] ") {
-                println!("{}", colored("%redAborted.%reset%"));
+            if !confirm!("%cyan%Unpatch install? %reset%[y/N] ", false) {
+                println!("{}", colored("%red%Aborted.%reset%"));
                 return;
             }
             unpatch = true;
         } else {
-            if !confirm!(N "%cyan%Patch install? %reset%[Y/n] ") {
+            if !confirm!("%cyan%Patch install? %reset%[Y/n] ", true) {
                 println!("{}", colored("%red%Aborted.%reset%"));
                 return;
             }
@@ -236,10 +231,10 @@ fn main() {
         match patch_asar(&resources, &path!(quartet_path, "loader.js")) {
             Ok(()) => println!("{}", colored("%yellow%Quartet installed!%reset%")),
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
-                explode!(format!("{:?}", e).as_str(), "run as root!");
+                explode!(format!("{e:?}").as_str(), "run as root!");
             }
             Err(e) => {
-                explode!(format!("{:?}", e).as_str(), "");
+                explode!(format!("{e:?}").as_str(), "");
             }
         }
     }
