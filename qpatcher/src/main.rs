@@ -65,10 +65,10 @@ macro_rules! ask {
 
 macro_rules! confirm {
     (Y $q:literal) => {
-        confirm!(true, [cyan $q] " [Y/n]")
+        confirm!(true, [cyan $q] " [Y/n] ")
     };
     (N $q:literal) => {
-        confirm!(false, [cyan $q] " [y/N]")
+        confirm!(false, [cyan $q] " [y/N] ")
     };
     ($default:expr, $($q:tt)*) => {
         match ask!($($q)*).as_str() {
@@ -208,26 +208,20 @@ fn main() {
     let is_patched = check_patched(&resources);
 
     if !(patch || unpatch) {
-        if is_patched {
-            if !confirm!(N "Unpatch install?") {
+        match is_patched {
+            true if confirm!(N "Unpatch install?") => unpatch = true,
+            false if confirm!(Y "Patch install?") => patch = true,
+            _ => {
                 cprintln!([red "Aborted."]);
                 return;
             }
-            unpatch = true;
-        } else {
-            if !confirm!(Y "Patch install?") {
-                cprintln!([red "Aborted."]);
-                return;
-            }
-            patch = true;
         }
     }
 
-    if is_patched && !unpatch {
-        explode!("Already patched!");
-    }
-    if !is_patched && unpatch {
-        explode!("Nothing to unpatch!");
+    match (is_patched, unpatch) {
+        (true, false) => explode!("Already patched!"),
+        (false, true) => explode!("Nothing to unpatch!"),
+        _ => (),
     }
 
     if unpatch {
