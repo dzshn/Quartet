@@ -1,8 +1,11 @@
-use crate::{path, paths::fix_perms};
+use crate::path;
 use std::{
     fs,
     path::{Path, PathBuf},
 };
+
+#[cfg(target_os = "linux")]
+use crate::paths::fix_perms;
 
 const DEVBUILD_URL: &str = "https://github.com/dzshn/Quartet/releases/download/devbuild";
 
