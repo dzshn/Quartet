@@ -1,7 +1,7 @@
 use std::{env, path::PathBuf, vec};
 
 #[cfg(target_os = "linux")]
-use {nix::unistd::User, std::path::Path};
+use nix::unistd::User;
 
 #[macro_export]
 macro_rules! path {
@@ -30,13 +30,13 @@ fn expand_tilde(path: &str) -> PathBuf {
 pub fn get_real_user() -> User {
     let doas_user = env::var("DOAS_USER");
     let sudo_user = env::var("SUDO_USER");
-    match doas_user.or(sudo_user).ok() {
-        Some(real_user) => match User::from_name(&real_user) {
+    match doas_user.or(sudo_user) {
+        Ok(real_user) => match User::from_name(&real_user) {
             Ok(Some(user)) => user,
             Ok(None) => panic!("Can't get user id for {real_user}"),
             Err(e) => panic!("Can't get user id for {real_user}: {e}"),
         },
-        None => panic!("Can't get user. Please use either doas or sudo!"),
+        _ => panic!("Can't get user. Please use either doas or sudo!"),
     }
 }
 
@@ -83,7 +83,7 @@ pub fn guess_path() -> Option<PathBuf> {
 }
 
 #[cfg(target_os = "linux")]
-pub fn fix_perms(path: &Path) {
+pub fn fix_perms(path: &PathBuf) {
     let user = get_real_user();
     match nix::unistd::chown(path, Some(user.uid), Some(user.gid)) {
         Ok(_) => (),

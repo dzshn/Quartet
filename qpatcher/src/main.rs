@@ -10,10 +10,12 @@ use std::{
 
 use clap::{arg, command, value_parser, Arg, ArgAction};
 use is_terminal::IsTerminal;
-use patcher::check_patched;
+use patcher::{check_patched, download_quartet, patch_asar};
 use paths::{get_install_path, guess_path};
 
-use crate::{patcher::unpatch_asar, paths::fix_perms};
+use crate::patcher::unpatch_asar;
+#[cfg(target_os = "linux")]
+use crate::paths::fix_perms;
 
 const HELP_TEMPLATE: &str = "\
 %blue%{name} %cyan%{version}%reset%
@@ -60,11 +62,6 @@ macro_rules! confirm {
 macro_rules! explode {
     ($msg:expr) => {
         explode!($msg, "Try running --help\n%yellow%usage: %blue%qpatcher %cyan%[options] <TETR.IO path>%reset%");
-    };
-    ($msg:expr, None) => {
-        print!("{}", colored("%red%Error: %reset%"));
-        println!("{}", colored($msg));
-        exit(0);
     };
     ($msg:expr, $hint:expr) => {
         print!("{}", colored("%red%Error: %reset%"));
@@ -159,14 +156,18 @@ fn main() {
     let repatch = m.get_flag("repatch");
     let mut patch = repatch || m.get_flag("patch");
     let mut unpatch = repatch || m.get_flag("unpatch");
+    let mut download = m.get_flag("download");
     let local = m.get_flag("local");
-    let download = m.get_flag("download");
 
     let mut default_quartet_path: PathBuf = Default::default();
     let quartet_path = m.get_one::<PathBuf>("path").unwrap_or_else(|| {
         let local_quartet = path!("../dist").canonicalize();
         default_quartet_path = match (local, local_quartet) {
-            (true, Ok(path)) if path.exists() => path,
+            (true, Ok(path)) if path.exists() => {
+                println!("Using ../dist");
+                download = false;
+                path
+            }
             _ => get_install_path().expect("no appropriate install path"),
         };
         &default_quartet_path
@@ -207,29 +208,39 @@ fn main() {
     }
 
     if is_patched && !unpatch {
-        explode!("Already patched!", None);
+        explode!("Already patched!", "");
     }
     if !is_patched && unpatch {
-        explode!("Nothing to unpatch!", None);
+        explode!("Nothing to unpatch!", "");
     }
 
     if unpatch {
         match unpatch_asar(&resources) {
-            Ok(()) => println!("{}", colored("%yellow%Quartet uninstalled%reset%")),
+            Ok(()) => println!("{}", colored("%yellow%Quartet uninstalled!%reset%")),
+            Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
+                explode!(format!("{:?}", e).as_str(), "run as root!");
+            }
             Err(e) => {
-                explode!(
-                    format!("{}", e).as_str(),
-                    if e.kind() == io::ErrorKind::PermissionDenied {
-                        "meow"
-                    } else {
-                        ""
-                    }
-                );
+                explode!(format!("{:?}", e).as_str(), "");
             }
         }
-        todo!();
     }
     if patch {
-        todo!();
+        if download {
+            fs::create_dir_all(quartet_path).unwrap();
+            #[cfg(target_os = "linux")]
+            fix_perms(&quartet_path);
+            download_quartet(&quartet_path).unwrap();
+        }
+
+        match patch_asar(&resources, &path!(quartet_path, "loader.js")) {
+            Ok(()) => println!("{}", colored("%yellow%Quartet installed!%reset%")),
+            Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
+                explode!(format!("{:?}", e).as_str(), "run as root!");
+            }
+            Err(e) => {
+                explode!(format!("{:?}", e).as_str(), "");
+            }
+        }
     }
 }
