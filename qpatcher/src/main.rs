@@ -235,9 +235,15 @@ fn main() {
     }
     if patch {
         if download {
-            fs::create_dir_all(quartet_path).unwrap();
-            #[cfg(target_os = "linux")]
-            fix_perms(quartet_path);
+            // Iterate instead of using create_dir_all so we can fix perms
+            // ::<> fishyy
+            for p in quartet_path.ancestors().collect::<Vec<_>>().iter().rev() {
+                if !p.exists() {
+                    fs::create_dir(p).unwrap();
+                    #[cfg(target_os = "linux")]
+                    fix_perms(&p.to_path_buf());
+                }
+            }
             download_quartet(quartet_path).unwrap();
         }
 
