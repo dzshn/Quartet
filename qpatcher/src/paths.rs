@@ -44,7 +44,7 @@ pub fn get_real_user() -> User {
 pub fn get_install_path() -> Option<PathBuf> {
     env::var("LOCALAPPDATA")
         .ok()
-        .map(|path| path!(&path, "Quartet/build"))
+        .map(|path| path!(&path, "Quartet", "build"))
 }
 
 #[cfg(target_os = "linux")]
@@ -60,7 +60,7 @@ pub fn get_install_path() -> Option<PathBuf> {
 #[cfg(target_os = "windows")]
 pub fn guess_path() -> Option<PathBuf> {
     let local_app_data = env::var("LOCALAPPDATA").expect("LOCALAPPDATA not set");
-    vec![path!(&local_app_data, "Programs/tetrio-desktop")]
+    vec![path!(&local_app_data, "Programs", "tetrio-desktop")]
         .iter()
         .find(|path| path.exists())
         .cloned()
