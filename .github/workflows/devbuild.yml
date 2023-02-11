@@ -1,5 +1,7 @@
 name: Test Quartet and upload devbuild
 on:
+    branches:
+        - main
     push:
         paths:
             - .github/workflows/devbuild.yml
