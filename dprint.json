@@ -1,0 +1,18 @@
+{
+    "indentWidth": 4,
+    "typescript": {
+        "arrowFunction.useParentheses": "preferNone",
+        "useBraces": "maintain",
+        "quoteProps": "asNeeded",
+        "quoteStyle": "preferDouble"
+    },
+    "markdown": {
+        "emphasisKind": "asterisks"
+    },
+    "includes": ["{src,scripts}/**/*.{ts,js,cjs,mjs,json}", "dprint.json", "**/README.md"],
+    "plugins": [
+        "https://plugins.dprint.dev/typescript-0.83.0.wasm",
+        "https://plugins.dprint.dev/json-0.17.0.wasm",
+        "https://plugins.dprint.dev/markdown-0.15.2.wasm"
+    ]
+}

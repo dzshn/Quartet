@@ -1,4 +1,4 @@
-/*!
+/*
  * Quartet, a client mod for TETR.IO
  * Copyright (c) 2023 Sofia Lima and contributors
  *
@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Log } from "@api";
 import { anonymousUA } from "@api/constants";
@@ -60,7 +60,7 @@ async function applyThemeFile(path: string) {
 
     try {
         themeKeys[path] = webFrame.insertCSS(
-            await readFile(path, { encoding: "utf-8" })
+            await readFile(path, { encoding: "utf-8" }),
         );
     } catch (err) {
         Log.error("CSS", `Error applying ${path}`, err);

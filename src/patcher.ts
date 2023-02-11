@@ -1,3 +1,21 @@
+/*
+ * Quartet, a client mod for TETR.IO
+ * Copyright (c) 2023 Sofia Lima and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { Log } from "@api";
 import { DefinedSettings, Settings, SettingType } from "@api/settings";
 import type { ComponentConstructorOptions, ComponentType } from "svelte";
@@ -47,11 +65,11 @@ export interface Plugin {
 
 if (!QUARTET_WEB) {
     // As preload.js is replaced completely, we have to set these manually
-    //@ts-ignore
+    // @ts-ignore
     window.IS_ELECTRON = true;
-    //@ts-ignore
+    // @ts-ignore
     window.IPC = QuartetBeryl._tetrioIpc;
-    //@ts-ignore
+    // @ts-ignore
     window.REFRESH_RATE = QuartetBeryl.refreshRate;
 
     // TETR.IO also sets your motherboard's serial number for fingerprinting. We don't.
@@ -68,7 +86,10 @@ window.eval = x => {
 };
 
 export function hookComponent<C extends ComponentType>(
-    component: C, target: HookTarget, at: string, props?: ComponentConstructorOptions<C>
+    component: C,
+    target: HookTarget,
+    at: string,
+    props?: ComponentConstructorOptions<C>,
 ) {
     const query = document.querySelector(at);
     if (!query)

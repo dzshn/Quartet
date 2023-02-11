@@ -1,3 +1,21 @@
+/*
+ * Quartet, a client mod for TETR.IO
+ * Copyright (c) 2023 Sofia Lima and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { Plugins } from "@patcher";
 import { ComponentType } from "svelte";
 import { IpcChannel } from "types";
@@ -8,7 +26,7 @@ export interface Settings {
     [plugin: string]: {
         enabled: boolean;
         [option: string]: any;
-    },
+    };
 }
 
 const settings = (() => {
@@ -28,9 +46,13 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
 
             if (!(prop in target)) {
                 if (path === "" && prop in Plugins) {
-                    return (target[prop] as any) = makeProxy({
-                        enabled: Plugins[prop].required || false
-                    }, root, `${prop}`);
+                    return (target[prop] as any) = makeProxy(
+                        {
+                            enabled: Plugins[prop].required || false,
+                        },
+                        root,
+                        `${prop}`,
+                    );
                 }
 
                 return value;
@@ -58,9 +80,8 @@ export enum SettingType {
     CUSTOM,
 }
 
-type TypeOfSetting<O extends PluginSettingDef> =
-    O extends StringPluginSetting ? string :
-    never;
+type TypeOfSetting<O extends PluginSettingDef> = O extends StringPluginSetting ? string
+    : never;
 
 type SettingsData<D extends SettingsDefinition> = {
     [K in keyof D]: TypeOfSetting<D[K]>;
@@ -92,7 +113,7 @@ export interface SelectPluginSetting {
     type: SettingType.SELECT;
     title: string;
     description?: string;
-    options: (string | { label: string, value: string, title?: string })[];
+    options: (string | { label: string; value: string; title?: string })[];
     default?: string;
 }
 
@@ -103,15 +124,17 @@ export interface CustomPluginSetting {
 
 export type SettingsDefinition = Record<string, PluginSettingDef>;
 
-export type PluginSettingDef = (
-    StringPluginSetting
-    | BooleanPluginSetting
-    | SelectPluginSetting
-    | CustomPluginSetting
-) & {
-    title: string;
-    requiresRestart?: boolean;
-};
+export type PluginSettingDef =
+    & (
+        | StringPluginSetting
+        | BooleanPluginSetting
+        | SelectPluginSetting
+        | CustomPluginSetting
+    )
+    & {
+        title: string;
+        requiresRestart?: boolean;
+    };
 
 export function definePluginSettings<D extends SettingsDefinition>(def: D) {
     const definedSettings = {

@@ -67,7 +67,7 @@
                             placeholder={def.placeholder}
                             autocomplete="off"
                             class="config_input rg_target_pri"
-                            bind:value={Settings[plugin.name][key]}
+                            bind:value={/* qhar */ /* eslint-disable svelte/valid-compile */ Settings[plugin.name][key]}
                         />
                     </div>
                 {:else if def.type === SettingType.BOOLEAN}

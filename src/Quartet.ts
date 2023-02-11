@@ -1,4 +1,4 @@
-/*!
+/*
  * Quartet, a client mod for TETR.IO
  * Copyright (c) 2023 Sofia Lima and contributors
  *
@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import type { BaseTexture } from "pixi.js";
 
@@ -75,14 +75,17 @@ export const GrabbedObjects = {} as {
     Assets: Record<string, {
         id: string;
         name: string;
-        format: "simple" | "connected",
-        assets: Record<string, Record<"hd" | "uhd", {
-            url: string;
-            loaded: boolean;
-            loading: boolean;
-            baseTexture?: BaseTexture;
-            textures: Record<string, unknown>;
-        }>>;
+        format: "simple" | "connected";
+        assets: Record<
+            string,
+            Record<"hd" | "uhd", {
+                url: string;
+                loaded: boolean;
+                loading: boolean;
+                baseTexture?: BaseTexture;
+                textures: Record<string, unknown>;
+            }>
+        >;
         colors: Record<"base" | "glow", Record<TextureName, number>>;
     }>;
     Loader: {

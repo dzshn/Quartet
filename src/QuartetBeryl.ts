@@ -1,7 +1,29 @@
+/*
+ * Quartet, a client mod for TETR.IO
+ * Copyright (c) 2023 Sofia Lima and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { Log } from "@api";
 import { ipcRenderer, IpcRendererEvent } from "electron";
-import { graphics } from "systeminformation";
 import { IpcChannel } from "types";
+import { join } from "path";
+
+const { graphics }: typeof import("systeminformation") = require(
+    join(process.env.__TETRIO_ASAR!, "node_modules/systeminformation")
+);
 
 type IpcRendererListener = (event: IpcRendererEvent, ...args: any[]) => void;
 
@@ -44,7 +66,7 @@ const Beryl = {
         invoke(channel: IpcChannel, ...args: any[]): Promise<any> {
             assertChannelAllowed(channel);
             return ipcRenderer.invoke(channel, ...args);
-        }
+        },
     },
     /**
      * Replacement for window.IPC (TETR.IO's preload.js sets it to ipcRenderer)

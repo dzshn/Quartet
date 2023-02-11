@@ -26,6 +26,9 @@ jobs:
           - name: Install project
             run: pnpm install
 
+          - name: Check formatting with dprint
+            run: pnpm dprint check
+
           - name: Lint using ESLint
             run: pnpm lint
 
