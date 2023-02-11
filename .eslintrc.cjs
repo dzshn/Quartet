@@ -1,46 +1,31 @@
-const globals = {
-    QUARTET_VERSION: "readonly",
-};
-
 /** @type {import("eslint").ESLint.ConfigData & { rules: import("eslint/rules").ESLintRules}} */
 module.exports = {
     root: true,
-    extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:svelte/recommended"],
     parser: "@typescript-eslint/parser",
-    plugins: [
-        "svelte3",
-        "@typescript-eslint",
-        "simple-import-sort",
-        "header",
-    ],
-    globals,
     overrides: [
         {
             files: ["*.svelte"],
-            processor: "svelte3/svelte3",
-            rules: {
-                "header/header": "off",
-            }
+            parser: "svelte-eslint-parser",
+            parserOptions: {
+                parser: "@typescript-eslint/parser",
+            },
         },
+        {
+            files: ["*.svelte", ".eslintrc.*"],
+            rules: { "header/header": "off" },
+        }
     ],
-    settings: {
-        "svelte3/typescript": true,
-        // Yes.
-        "svelte3/ignore-warnings": (
-            /** @param {import("svelte/types/compiler/interfaces").Warning} w */
-            ({ code, message }) => (
-                code === "missing-declaration"
-                    && Object.keys(globals).some(g => message.startsWith(`'${g}'`))
-                // TETR.IO already handles key events for all elements, so not an issue.
-                || code === "a11y-click-events-have-key-events"
-            )
-        ),
+    plugins: ["svelte", "@typescript-eslint", "header"],
+    globals: {
+        QUARTET_VERSION: "readonly",
     },
     rules: {
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-var-requires": "off",
+        "svelte/valid-compile": ["error", { ignoreWarnings: true }],
         "eol-last": ["error", "always"],
         "eqeqeq": ["error", "always", { null: "ignore" }],
         "header/header": [
