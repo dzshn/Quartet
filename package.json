@@ -18,7 +18,7 @@
         "url": "https://github.com/Quartet"
     },
     "scripts": {
-        "lint": "eslint src --ext .js,.ts,.svelte",
+        "lint": "eslint src scripts --ext .js,.ts,.svelte",
         "fix": "eslint --fix",
         "build": "tsx scripts/build.ts"
     },
@@ -29,6 +29,7 @@
         "@typescript-eslint/parser": "^5.49.0",
         "esbuild": "^0.17.5",
         "eslint": "^8.32.0",
+        "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-simple-import-sort": "^10.0.0",
         "eslint-plugin-svelte3": "^4.0.0",
         "pixi.js": "^7.1.1",

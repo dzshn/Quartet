@@ -11,12 +11,16 @@ module.exports = {
         "svelte3",
         "@typescript-eslint",
         "simple-import-sort",
+        "header",
     ],
     globals,
     overrides: [
         {
             files: ["*.svelte"],
             processor: "svelte3/svelte3",
+            rules: {
+                "header/header": "off",
+            }
         },
     ],
     settings: {
@@ -46,7 +50,31 @@ module.exports = {
         "dot-notation": "error",
         "eol-last": ["error", "always"],
         "eqeqeq": ["error", "always", { null: "ignore" }],
+        "header/header": [
+            "error",
+            "block", [
+                "",
+                " * Quartet, a client mod for TETR.IO",
+                { pattern: " \\* Copyright \\(c\\) \\d{4}", template: ` * Copyright (c) ${new Date().getFullYear()} Sofia Lima and contributors` },
+                " *",
+                " * This program is free software: you can redistribute it and/or modify",
+                " * it under the terms of the GNU General Public License as published by",
+                " * the Free Software Foundation, either version 3 of the License, or",
+                " * (at your option) any later version.",
+                " *",
+                " * This program is distributed in the hope that it will be useful,",
+                " * but WITHOUT ANY WARRANTY; without even the implied warranty of",
+                " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the",
+                " * GNU General Public License for more details.",
+                " *",
+                " * You should have received a copy of the GNU General Public License",
+                " * along with this program.  If not, see <https://www.gnu.org/licenses/>.",
+                " "
+            ],
+            2
+        ],
         "indent": ["error", 4],
+        "linebreak-style": ["error", "unix"],
         "no-duplicate-imports": "error",
         "no-self-compare": "error",
         "no-trailing-spaces": "error",
