@@ -18,11 +18,11 @@
 
 import { Log } from "@api";
 import { ipcRenderer, IpcRendererEvent } from "electron";
-import { IpcChannel } from "types";
 import { join } from "path";
+import { IpcChannel } from "types";
 
 const { graphics }: typeof import("systeminformation") = require(
-    join(process.env.__TETRIO_ASAR!, "node_modules/systeminformation")
+    join(process.env.__TETRIO_ASAR!, "node_modules/systeminformation"),
 );
 
 type IpcRendererListener = (event: IpcRendererEvent, ...args: any[]) => void;
