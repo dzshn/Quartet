@@ -36,6 +36,8 @@ const tetrioAsarPath = join(require.main!.path, "..", "_app.asar");
 app.setAppPath(tetrioAsarPath);
 
 if (!process.argv.includes("--vanilla")) {
+    process.env.__TETRIO_ASAR = tetrioAsarPath;
+
     let settings: Partial<Settings>;
     try {
         settings = JSON.parse(readSettingsSync());
