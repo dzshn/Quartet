@@ -65,11 +65,11 @@ export interface Plugin {
 
 if (!QUARTET_WEB) {
     // As preload.js is replaced completely, we have to set these manually
-    //@ts-ignore
+    // @ts-ignore
     window.IS_ELECTRON = true;
-    //@ts-ignore
+    // @ts-ignore
     window.IPC = QuartetBeryl._tetrioIpc;
-    //@ts-ignore
+    // @ts-ignore
     window.REFRESH_RATE = QuartetBeryl.refreshRate;
 
     // TETR.IO also sets your motherboard's serial number for fingerprinting. We don't.
@@ -86,7 +86,10 @@ window.eval = x => {
 };
 
 export function hookComponent<C extends ComponentType>(
-    component: C, target: HookTarget, at: string, props?: ComponentConstructorOptions<C>
+    component: C,
+    target: HookTarget,
+    at: string,
+    props?: ComponentConstructorOptions<C>,
 ) {
     const query = document.querySelector(at);
     if (!query)

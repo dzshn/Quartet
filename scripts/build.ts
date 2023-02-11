@@ -21,8 +21,8 @@ import { readdir, readFile } from "node:fs/promises";
 import process from "node:process";
 
 import esbuild from "esbuild";
-import * as svelte from "svelte/compiler";
 import sveltePreprocess from "svelte-preprocess";
+import * as svelte from "svelte/compiler";
 
 const watch = process.argv.includes("--watch");
 const web = process.argv.includes("--web");
@@ -56,13 +56,12 @@ const sveltePreprocessor = sveltePreprocess({
             tsconfigRaw: {
                 compilerOptions: {
                     importsNotUsedAsValues: "preserve",
-                    preserveValueImports: true
-                }
-            }
+                    preserveValueImports: true,
+                },
+            },
         });
-    }
+    },
 });
-
 
 const esbuildOpts: esbuild.BuildOptions = {
     logLevel: "info",
@@ -92,7 +91,8 @@ const esbuildOpts: esbuild.BuildOptions = {
             name: "plugins",
             setup(build) {
                 build.onResolve({ filter: /^~plugins$/ }, args => ({
-                    namespace: "all-plugins", path: args.path
+                    namespace: "all-plugins",
+                    path: args.path,
                 }));
                 build.onLoad({ filter: /^~plugins$/, namespace: "all-plugins" }, async () => {
                     let contents = "const p = []; export default p;\n";
@@ -105,8 +105,8 @@ const esbuildOpts: esbuild.BuildOptions = {
 
                     return { contents, resolveDir: "./src" };
                 });
-            }
-        }
+            },
+        },
     ],
     define: {
         QUARTET_VERSION: JSON.stringify(version),
@@ -144,9 +144,11 @@ function dedent(text: string) {
 function simplifyInputs(obj: esbuild.Metafile | esbuild.Metafile["outputs"][string]) {
     // Make analysis a bit easier to read by shortening node_modules paths:
     // node_modules/.pnpm/package@ver/node_modules/package -> package
-    obj.inputs = Object.fromEntries(Object.entries(obj.inputs).map(
-        ([k, v]) => [k.replace(/^node_modules\/(\.pnpm\/.*\/node_modules\/)?/, ""), v]
-    ));
+    obj.inputs = Object.fromEntries(
+        Object.entries(obj.inputs).map(
+            ([k, v]) => [k.replace(/^node_modules\/(\.pnpm\/.*\/node_modules\/)?/, ""), v],
+        ),
+    );
 }
 
 async function main() {
@@ -189,7 +191,7 @@ async function main() {
                 `) + license,
             },
             footer: {
-                js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet"
+                js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet",
             },
         });
 

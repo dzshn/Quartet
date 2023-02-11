@@ -22,18 +22,17 @@ import electron, { app, BrowserWindowConstructorOptions, session } from "electro
 import { readSettingsSync } from "ipc";
 import { join } from "path";
 
-
 console.log(
-    "[Quartet] Loading...\n" +
-    "  ／l、      \n" +
-    "（ﾟ､ ｡ ７    \n" +
-    "  l、 ~ヽ    \n" +
-    "  じしf_,)ノ ",
+    "[Quartet] Loading...\n"
+        + "  ／l、      \n"
+        + "（ﾟ､ ｡ ７    \n"
+        + "  l、 ~ヽ    \n"
+        + "  じしf_,)ノ ",
 );
 
 const tetrioAsarPath = join(require.main!.path, "..", "_app.asar");
 
-//@ts-ignore skull emoji
+// @ts-ignore skull emoji
 app.setAppPath(tetrioAsarPath);
 
 if (!process.argv.includes("--vanilla")) {
@@ -50,7 +49,7 @@ if (!process.argv.includes("--vanilla")) {
                 options.webPreferences.preload = join(__dirname, "preload.js");
                 // We rewrite preload completely, so we might as well make it safer.
                 options.webPreferences.contextIsolation = true;
-                //@ts-ignore (doesn't exist in newer electron versions)
+                // @ts-ignore (doesn't exist in newer electron versions)
                 options.webPreferences.worldSafeExecuteJavaScript = true;
                 // Why is this set to false??
                 options.webPreferences.backgroundThrottling = true;
@@ -60,7 +59,7 @@ if (!process.argv.includes("--vanilla")) {
 
             // Silly hack in case you cannot open devtools (usually because you exploded this script or preload)
             if (process.argv.includes("--devtools"))
-                //@ts-ignore
+                // @ts-ignore
                 this.toggleDevTools();
         }
     }

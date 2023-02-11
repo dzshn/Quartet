@@ -75,14 +75,17 @@ export const GrabbedObjects = {} as {
     Assets: Record<string, {
         id: string;
         name: string;
-        format: "simple" | "connected",
-        assets: Record<string, Record<"hd" | "uhd", {
-            url: string;
-            loaded: boolean;
-            loading: boolean;
-            baseTexture?: BaseTexture;
-            textures: Record<string, unknown>;
-        }>>;
+        format: "simple" | "connected";
+        assets: Record<
+            string,
+            Record<"hd" | "uhd", {
+                url: string;
+                loaded: boolean;
+                loading: boolean;
+                baseTexture?: BaseTexture;
+                textures: Record<string, unknown>;
+            }>
+        >;
         colors: Record<"base" | "glow", Record<TextureName, number>>;
     }>;
     Loader: {

@@ -60,7 +60,7 @@ async function applyThemeFile(path: string) {
 
     try {
         themeKeys[path] = webFrame.insertCSS(
-            await readFile(path, { encoding: "utf-8" })
+            await readFile(path, { encoding: "utf-8" }),
         );
     } catch (err) {
         Log.error("CSS", `Error applying ${path}`, err);

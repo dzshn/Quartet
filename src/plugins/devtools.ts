@@ -25,7 +25,8 @@ const settings = definePluginSettings({
     immediatelyTransitionTo: {
         type: SettingType.SELECT,
         title: "immediately transition to here when TETR.IO starts",
-        description: "When the game starts, you'll see this menu instead of the main one. This is useful if you're working on one",
+        description:
+            "When the game starts, you'll see this menu instead of the main one. This is useful if you're working on one",
         default: "none",
         // We use a getter as the DOM might not be loaded yet
         get options() {
@@ -45,7 +46,7 @@ const settings = definePluginSettings({
                 }),
             ];
         },
-    }
+    },
 });
 
 export default {
@@ -60,5 +61,5 @@ export default {
                 GrabbedObjects.transitionTo(settings.data.immediatelyTransitionTo);
             });
         }
-    }
+    },
 } satisfies Plugin;

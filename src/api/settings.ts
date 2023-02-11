@@ -26,7 +26,7 @@ export interface Settings {
     [plugin: string]: {
         enabled: boolean;
         [option: string]: any;
-    },
+    };
 }
 
 const settings = (() => {
@@ -46,9 +46,13 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
 
             if (!(prop in target)) {
                 if (path === "" && prop in Plugins) {
-                    return (target[prop] as any) = makeProxy({
-                        enabled: Plugins[prop].required || false
-                    }, root, `${prop}`);
+                    return (target[prop] as any) = makeProxy(
+                        {
+                            enabled: Plugins[prop].required || false,
+                        },
+                        root,
+                        `${prop}`,
+                    );
                 }
 
                 return value;
@@ -76,9 +80,8 @@ export enum SettingType {
     CUSTOM,
 }
 
-type TypeOfSetting<O extends PluginSettingDef> =
-    O extends StringPluginSetting ? string :
-    never;
+type TypeOfSetting<O extends PluginSettingDef> = O extends StringPluginSetting ? string
+    : never;
 
 type SettingsData<D extends SettingsDefinition> = {
     [K in keyof D]: TypeOfSetting<D[K]>;
@@ -110,7 +113,7 @@ export interface SelectPluginSetting {
     type: SettingType.SELECT;
     title: string;
     description?: string;
-    options: (string | { label: string, value: string, title?: string })[];
+    options: (string | { label: string; value: string; title?: string })[];
     default?: string;
 }
 
@@ -121,15 +124,17 @@ export interface CustomPluginSetting {
 
 export type SettingsDefinition = Record<string, PluginSettingDef>;
 
-export type PluginSettingDef = (
-    StringPluginSetting
-    | BooleanPluginSetting
-    | SelectPluginSetting
-    | CustomPluginSetting
-) & {
-    title: string;
-    requiresRestart?: boolean;
-};
+export type PluginSettingDef =
+    & (
+        | StringPluginSetting
+        | BooleanPluginSetting
+        | SelectPluginSetting
+        | CustomPluginSetting
+    )
+    & {
+        title: string;
+        requiresRestart?: boolean;
+    };
 
 export function definePluginSettings<D extends SettingsDefinition>(def: D) {
     const definedSettings = {

@@ -62,7 +62,7 @@ const Beryl = {
         invoke(channel: IpcChannel, ...args: any[]): Promise<any> {
             assertChannelAllowed(channel);
             return ipcRenderer.invoke(channel, ...args);
-        }
+        },
     },
     /**
      * Replacement for window.IPC (TETR.IO's preload.js sets it to ipcRenderer)
