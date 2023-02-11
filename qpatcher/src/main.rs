@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 mod patcher;
 mod paths;
 
@@ -101,8 +102,7 @@ macro_rules! explode {
 fn do_color() -> bool {
     env::var("NO_COLOR").is_err()
         && supports_color::on_cached(supports_color::Stream::Stdout)
-            .map(|support| support.has_basic)
-            .unwrap_or(false)
+            .map_or(false, |support| support.has_basic)
 }
 
 fn ask_path() -> PathBuf {
@@ -117,6 +117,7 @@ fn ask_path() -> PathBuf {
     }
 }
 
+#[allow(clippy::too_many_lines)] // shrug
 fn main() {
     let help_template = colored!(
         [blue "{name} "] [cyan "{version}\n"]
@@ -165,21 +166,21 @@ fn main() {
     let mut download = m.get_flag("download");
     let local = m.get_flag("local");
 
-    let mut default_quartet_path: PathBuf = Default::default();
+    let mut default_quartet_path: PathBuf = PathBuf::default();
     let quartet_path = m.get_one::<PathBuf>("path").unwrap_or_else(|| {
-        let local_quartet = path!("../dist").canonicalize();
-        default_quartet_path = match (local, local_quartet) {
-            (true, Ok(path)) if path.exists() => {
+        let local_quartet = path!("../dist");
+        default_quartet_path = match local_quartet.try_exists() {
+            Ok(true) if local => {
                 println!("Using ../dist");
                 download = false;
-                path
+                local_quartet.canonicalize().unwrap()
             }
-            _ => get_install_path().expect("no appropriate install path"),
+            _ => get_install_path(),
         };
         &default_quartet_path
     });
 
-    let mut default_tetrio_path: PathBuf = Default::default();
+    let mut default_tetrio_path: PathBuf = PathBuf::default();
     let tetrio_path = m.get_one::<PathBuf>("tetrio_path").unwrap_or_else(|| {
         default_tetrio_path = guess_path().unwrap_or_else(ask_path);
         &default_tetrio_path
@@ -208,6 +209,7 @@ fn main() {
     let is_patched = check_patched(&resources);
 
     if !(patch || unpatch) {
+        #[allow(clippy::match_bool)]
         match is_patched {
             true if confirm!(N "Unpatch install?") => unpatch = true,
             false if confirm!(Y "Patch install?") => patch = true,
@@ -228,9 +230,9 @@ fn main() {
         match unpatch_asar(&resources) {
             Ok(()) => cprintln!([yellow "Quartet uninstalled!"]),
             Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
-                explode!(format!("{:?}", e).as_str(), "run as root!")
+                explode!(format!("{e:?}").as_str(), "run as root!");
             }
-            Err(e) => explode!(format!("{:?}", e).as_str()),
+            Err(e) => explode!(format!("{e:?}").as_str()),
         }
     }
     if patch {

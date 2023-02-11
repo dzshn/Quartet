@@ -41,20 +41,18 @@ pub fn get_real_user() -> User {
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_install_path() -> Option<PathBuf> {
-    env::var("LOCALAPPDATA")
-        .ok()
-        .map(|path| path!(&path, "Quartet", "build"))
+pub fn get_install_path() -> PathBuf {
+    path!(env::var("LOCALAPPDATA").unwrap(), "Quartet", build)
 }
 
 #[cfg(target_os = "linux")]
-pub fn get_install_path() -> Option<PathBuf> {
-    Some(expand_tilde("~/.local/share/Quartet/build"))
+pub fn get_install_path() -> PathBuf {
+    expand_tilde("~/.local/share/Quartet/build")
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_install_path() -> Option<PathBuf> {
-    Some(expand_tilde("~/Library/Application Support/Quartet/build"))
+pub fn get_install_path() -> PathBuf {
+    expand_tilde("~/Library/Application Support/Quartet/build")
 }
 
 #[cfg(target_os = "windows")]
