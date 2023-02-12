@@ -15,7 +15,6 @@ use patcher::{check_patched, download_quartet, patch_asar};
 use paths::{get_install_path, guess_path};
 
 use crate::patcher::unpatch_asar;
-#[cfg(target_os = "linux")]
 use crate::paths::fix_perms;
 
 macro_rules! colored {
@@ -242,7 +241,6 @@ fn main() {
             for p in quartet_path.ancestors().collect::<Vec<_>>().iter().rev() {
                 if !p.exists() {
                     fs::create_dir(p).unwrap();
-                    #[cfg(target_os = "linux")]
                     fix_perms(&p.to_path_buf());
                 }
             }

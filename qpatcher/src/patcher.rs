@@ -1,11 +1,9 @@
 use crate::path;
+use crate::paths::fix_perms;
 use std::{
     fs,
     path::{Path, PathBuf},
 };
-
-#[cfg(target_os = "linux")]
-use crate::paths::fix_perms;
 
 const DEVBUILD_URL: &str = "https://github.com/dzshn/Quartet/releases/download/devbuild";
 
@@ -18,7 +16,6 @@ pub fn download_quartet(install_path: &PathBuf) -> Result<(), Box<dyn std::error
         println!("Downloading {} to {}", filename, install_path.display());
         // into_string is okay since we expect less than a mb of data
         fs::write(&file_path, agent.get(&url).call()?.into_string()?)?;
-        #[cfg(target_os = "linux")]
         fix_perms(&file_path);
     }
     Ok(())
