@@ -62,7 +62,7 @@ pub fn fix_perms(_: &PathBuf) {}
 
 #[cfg(target_os = "windows")]
 pub fn get_install_path() -> PathBuf {
-    path!(env::var("LOCALAPPDATA").unwrap(), "Quartet", build)
+    path!(&env::var("LOCALAPPDATA").unwrap(), "Quartet", "build")
 }
 
 #[cfg(target_os = "windows")]
