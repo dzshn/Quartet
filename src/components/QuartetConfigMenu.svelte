@@ -1,11 +1,11 @@
 <script lang="ts">
     import { Settings, SettingType } from "@api/settings";
-    import { GrabbedObjects } from "Quartet";
+    import { showNotification } from "@api/objects";
 
     import plugins from "~plugins";
 
     function notifyRestart(what: string) {
-        GrabbedObjects.showNotification({
+        showNotification({
             msg: `${what} requires a restart to fully apply. hit F5 to restart!`,
             icon: "warning",
             color: "#fb84bc",

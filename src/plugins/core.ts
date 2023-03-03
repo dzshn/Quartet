@@ -47,31 +47,31 @@ export default {
     patches: [
         {
             match: /function (\w+)\(\w+,\w+\)\{.{1,100}\[data-menuview\]/,
-            replace: "Quartet.GrabbedObjects.transitionTo=$1;$&",
+            replace: "Quartet.Internal.Objects.transitionTo=$1;$&",
         },
         {
             match: /(const \w+=)(\{none:\{back:null)/,
-            replace: "$1Quartet.GrabbedObjects.Menus=$2",
+            replace: "$1Quartet.Internal.Objects.Menus=$2",
         },
         {
             match: /(const \w+=)(\{tetrio:\{id:)/,
-            replace: "$1Quartet.GrabbedObjects.Assets=$2",
+            replace: "$1Quartet.Internal.Objects.Assets=$2",
         },
         {
             match: /,(\w+)=(\{home:\{starter:)/,
-            replace: ";const $1=Quartet.GrabbedObjects.Layout=$2",
+            replace: ";const $1=Quartet.Internal.Objects.Layout=$2",
         },
         {
             match: /(const \w+=)(function\(\)\{const \w+=\{sfx:\{state:)/,
-            replace: "$1Quartet.GrabbedObjects.Loader=$2",
+            replace: "$1Quartet.Internal.Objects.Loader=$2",
         },
         {
             match: /function (\w+)\(\w+\)\{.{1,100}\.suppressable&&/,
-            replace: "Quartet.GrabbedObjects.showNotification=$1;$&",
+            replace: "Quartet.Internal.Objects.showNotification=$1;$&",
         },
         {
             match: /(const \w+=)(\(\(\)=>\{.{1,100}"No-GPU")/,
-            replace: "$1Quartet.GrabbedObjects.Fingerprint=$2",
+            replace: "$1Quartet.Internal.Objects.Fingerprint=$2",
         },
         {
             // In order:

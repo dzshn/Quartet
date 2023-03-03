@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { GrabbedObjects } from "Quartet";
+    import { Layout, Menus, transitionTo } from "@api/objects";
 
-    GrabbedObjects.Menus.config_quartet = {
+    Menus.config_quartet = {
         header: "CONFIG / QUARTET",
         footer: "change Quartet settings",
         back: "config",
     };
 
-    GrabbedObjects.Layout.config_quartet = {
+    Layout.config_quartet = {
         starter: "f!.rg_target_pri",
         back: "#back",
         items: {
@@ -25,7 +25,7 @@
     class="scroller_item scroller_item_config has_description ns rg_target_pri"
     data-hover="hover"
     data-hit="hit2"
-    on:click={() => GrabbedObjects.transitionTo("config_quartet")}
+    on:click={() => transitionTo("config_quartet")}
 >
     <h1>Quartet</h1>
     <p>change settings for Quartet</p>

@@ -18,8 +18,8 @@
 
 import { Devs } from "@api/constants";
 import { definePluginSettings, SettingType } from "@api/settings";
+import { Loader, Menus, transitionTo } from "@api/objects";
 import { Plugin } from "@patcher";
-import { GrabbedObjects } from "Quartet";
 
 const settings = definePluginSettings({
     immediatelyTransitionTo: {
@@ -41,7 +41,7 @@ const settings = definePluginSettings({
                 "none",
                 // Also sort by length so options grid looks a bit nicer
                 ...menus.sort().sort((a, b) => a.length - b.length).map(key => {
-                    const menu = GrabbedObjects.Menus[key];
+                    const menu = Menus[key];
                     return { label: key, value: key, title: `Header: ${menu.header}\nFooter: ${menu.footer}` };
                 }),
             ];
@@ -57,8 +57,8 @@ export default {
 
     start() {
         if (settings.data.immediatelyTransitionTo !== "none") {
-            GrabbedObjects.Loader.ready(() => {
-                GrabbedObjects.transitionTo(settings.data.immediatelyTransitionTo);
+            Loader.ready(() => {
+                transitionTo(settings.data.immediatelyTransitionTo);
             });
         }
     },

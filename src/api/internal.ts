@@ -16,9 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * as Api from "@api";
-export * as Internal from "@api/internal";
-export * as Objects from "@api/objects";
-export * as Patcher from "@patcher";
+type Objects = typeof import("@api/objects");
 
-export { Settings } from "@api/settings";
+const setters = {} as Record<keyof Objects, (v: any) => void>;
+
+/**
+ * Magic write-only object for use in patches.
+ * @see {@link src/plugins/core} for usage.
+ */
+export const Objects = new Proxy({}, {
+    get() {
+        throw new Error("Write-only object.");
+    },
+    set: (_, prop: keyof Objects, value) => {
+        setters[prop](value);
+        return true;
+    }
+});
+
+export function grabberFor<K extends keyof Objects>(name: K, callback: (v: Objects[K]) => void) {
+    setters[name] = callback;
+}
