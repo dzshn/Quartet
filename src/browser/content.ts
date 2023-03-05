@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import browser from "webextension-polyfill";
+type Browser = typeof import("webextension-polyfill");
+
+const browser: Browser = typeof (globalThis as any).browser === "undefined"
+    ? (globalThis as any).chrome
+    : (globalThis as any).browser;
 
 const script = document.createElement("script");
 script.src = browser.runtime.getURL("quartet.js");

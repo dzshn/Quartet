@@ -38,13 +38,13 @@
         "svelte-preprocess": "^5.0.1",
         "systeminformation": "^5.17.8",
         "tsx": "^3.12.2",
-        "typescript": "^4.9.4"
+        "typescript": "^4.9.4",
+        "webextension-polyfill": "^0.10.0"
     },
     "dependencies": {
         "@types/webextension-polyfill": "^0.10.0",
         "idb-keyval": "^6.2.0",
-        "standalone-electron-types": "^1.0.0",
-        "webextension-polyfill": "^0.10.0"
+        "standalone-electron-types": "^1.0.0"
     },
     "packageManager": "pnpm@^7",
     "pnpm": {

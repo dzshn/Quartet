@@ -165,6 +165,7 @@ const webextBuilderPlugin: esbuild.Plugin = {
         build.onStart(async () => {
             const { outputFiles, errors, warnings } = await esbuild.build({
                 entryPoints: ["src/browser/content.ts"],
+                format: "iife",
                 write: false,
                 bundle: true,
                 minify,
