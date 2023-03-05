@@ -31,7 +31,7 @@ export const Objects = new Proxy({}, {
     set: (_, prop: keyof Objects, value) => {
         setters[prop](value);
         return true;
-    }
+    },
 });
 
 export function grabberFor<K extends keyof Objects>(name: K, callback: (v: Objects[K]) => void) {

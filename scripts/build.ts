@@ -223,22 +223,29 @@ async function main() {
                                 entryPoints: ["src/browser/content.ts"],
                                 outfile: "dist/browser-content.js",
                             });
-                            await writeFile("dist/extension.zip", await zip({
-                                "content.js": await readFile("dist/browser-content.js"),
-                                "quartet.js": await readFile("dist/quartet.js"),
-                                "manifest.json": fflate.strToU8(JSON.stringify({
-                                    manifest_version: 3,
-                                    name: "Quartet",
-                                    description: "A cute and minimal TETR.IO client mod",
-                                    version,
-                                    content_scripts: [
+                            await writeFile(
+                                "dist/extension.zip",
+                                await zip({
+                                    "content.js": await readFile("dist/browser-content.js"),
+                                    "quartet.js": await readFile("dist/quartet.js"),
+                                    "manifest.json": fflate.strToU8(JSON.stringify(
                                         {
-                                            matches: ["*://tetr.io/*"],
-                                            js: ["content.js"]
-                                        }
-                                    ]
-                                }, null, 4)),
-                            }));
+                                            manifest_version: 3,
+                                            name: "Quartet",
+                                            description: "A cute and minimal TETR.IO client mod",
+                                            version,
+                                            content_scripts: [
+                                                {
+                                                    matches: ["*://tetr.io/*"],
+                                                    js: ["content.js"],
+                                                },
+                                            ],
+                                        },
+                                        null,
+                                        4,
+                                    )),
+                                }),
+                            );
                         });
                     },
                 },

@@ -17,8 +17,8 @@
  */
 
 import { Devs } from "@api/constants";
-import { definePluginSettings, SettingType } from "@api/settings";
 import { Loader, Menus, transitionTo } from "@api/objects";
+import { definePluginSettings, SettingType } from "@api/settings";
 import { Plugin } from "@patcher";
 
 const settings = definePluginSettings({

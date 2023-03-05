@@ -36,7 +36,7 @@ browser.webRequest.onBeforeSendHeaders.addListener(
         return { requestHeaders };
     },
     { urls: ["<all_urls>"] },
-    ["blocking", "requestHeaders"]
+    ["blocking", "requestHeaders"],
 );
 
 browser.tabs.getCurrent().then(tab => {
@@ -44,4 +44,4 @@ browser.tabs.getCurrent().then(tab => {
         target: { tabId: tab.id! },
         files: ["quartet.js"],
     });
-})
+});
