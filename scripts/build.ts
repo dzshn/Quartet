@@ -17,17 +17,21 @@
  */
 
 import { execSync } from "node:child_process";
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
+import { promisify } from "node:util";
 
 import esbuild from "esbuild";
+import fflate from "fflate";
 import sveltePreprocess from "svelte-preprocess";
 import * as svelte from "svelte/compiler";
+
+const zip = promisify(fflate.zip);
 
 const watch = process.argv.includes("--watch");
 const web = process.argv.includes("--web");
 const gitHash = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
-const version = `${process.env.npm_package_version} (${gitHash})`;
+const version = `${process.env.npm_package_version}+git.${gitHash}`;
 
 const license = dedent(`
     /*
@@ -66,7 +70,7 @@ const sveltePreprocessor = sveltePreprocess({
 const esbuildOpts: esbuild.BuildOptions = {
     logLevel: "info",
     metafile: true,
-    minify: !watch,
+    minify: true,
     bundle: true,
     platform: "node",
     target: ["chrome83"],
@@ -151,6 +155,18 @@ function simplifyInputs(obj: esbuild.Metafile | esbuild.Metafile["outputs"][stri
     );
 }
 
+function userScriptHeader(metadata: Record<string, string>) {
+    const length = Math.max(...Object.keys(metadata).map(k => k.length));
+
+    return [
+        "// ==UserScript==",
+        ...Object.entries(metadata).map(
+            ([k, v]) => `// @${k}${" ".repeat(length - k.length)}  ${v}`,
+        ),
+        "// ==/UserScript==",
+    ].join("\n");
+}
+
 async function main() {
     const contexts: esbuild.BuildContext[] = [];
 
@@ -176,26 +192,61 @@ async function main() {
                 window: "unsafeWindow",
             },
             banner: {
-                js: dedent(`\
-                    // ==UserScript==
-                    // @name         Quartet
-                    // @namespace    https://github.com/dzshn
-                    // @description  A cute and minimal TETR.IO client mod
-                    // @version      ${version}
-                    // @author       dzshn (https://dzshn.xyz)
-                    // @license      GPL-3.0-or-later
-                    // @donate       https://ko-fi.com/dzshn
-                    // @match        *://tetr.io/*
-                    // @run-at       document-start
-                    // ==/UserScript==
-                `) + license,
+                js: userScriptHeader({
+                    name: "Quartet",
+                    namespace: "https://github.com/dzshn",
+                    description: "A cute and minimal TETR.IO client mod",
+                    version,
+                    author: "dzshn (https://dzshn.xyz)",
+                    license: "GPL-3.0-or-later",
+                    donate: "https://ko-fi.com/dzshn",
+                    match: "*://tetr.io/*",
+                    "run-at": "document-start",
+                }) + "\n" + license,
             },
             footer: {
                 js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet",
             },
         });
 
-        contexts.push(userscriptCtx);
+        const browserCtx = await esbuild.context({
+            ...esbuildWebOpts,
+            outfile: "dist/browser.js",
+            plugins: [
+                ...esbuildWebOpts.plugins!,
+                {
+                    name: "extension-builder",
+                    setup(build) {
+                        build.onEnd(async () => {
+                            await esbuild.build({
+                                ...esbuildOpts,
+                                entryPoints: ["src/browser/content.ts"],
+                                outfile: "dist/browser-content.js",
+                            });
+                            await writeFile("dist/extension.zip", await zip({
+                                "content.js": await readFile("dist/browser-content.js"),
+                                "quartet.js": await readFile("dist/quartet.js"),
+                                "manifest.json": fflate.strToU8(JSON.stringify({
+                                    manifest_version: 3,
+                                    name: "Quartet",
+                                    description: "A cute and minimal TETR.IO client mod",
+                                    version,
+                                    content_scripts: [
+                                        {
+                                            matches: ["*://tetr.io/*"],
+                                            js: ["content.js"]
+                                        }
+                                    ]
+                                }, null, 4)),
+                            }));
+                        });
+                    },
+                },
+            ],
+            footer: { js: "//# sourceURL=Quartet" },
+        });
+
+        contexts.push(userscriptCtx, browserCtx);
     }
 
     const loaderCtx = await esbuild.context({

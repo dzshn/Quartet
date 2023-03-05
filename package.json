@@ -32,6 +32,7 @@
         "eslint": "^8.32.0",
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-svelte": "^2.18.0",
+        "fflate": "^0.7.4",
         "pixi.js": "^7.1.1",
         "svelte": "^3.55.1",
         "svelte-preprocess": "^5.0.1",
@@ -40,7 +41,15 @@
         "typescript": "^4.9.4"
     },
     "dependencies": {
-        "standalone-electron-types": "^1.0.0"
+        "@types/webextension-polyfill": "^0.10.0",
+        "idb-keyval": "^6.2.0",
+        "standalone-electron-types": "^1.0.0",
+        "webextension-polyfill": "^0.10.0"
     },
-    "packageManager": "pnpm@^7"
+    "packageManager": "pnpm@^7",
+    "pnpm": {
+        "patchedDependencies": {
+            "idb-keyval@6.2.0": "patches/idb-keyval@6.2.0.patch"
+        }
+    }
 }
