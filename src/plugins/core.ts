@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { anonymousUA, Devs } from "@api/constants";
+import { Devs } from "@api/constants";
 import { definePluginSettings, SettingType } from "@api/settings";
 import QuartetConfig from "@components/QuartetConfig.svelte";
 import QuartetConfigMenu from "@components/QuartetConfigMenu.svelte";
@@ -31,12 +31,6 @@ const settings = definePluginSettings({
         requiresRestart: true,
     },
 });
-
-// We can't actually change the UA on userscripts, so leave it as what
-// TETR.IO would otherwise set to as to not accidentally trigger something
-const userAgent = QUARTET_USERSCRIPT
-    ? navigator.userAgent.replace("//", "--")
-    : anonymousUA;
 
 export default {
     name: "Quartet",
@@ -90,9 +84,9 @@ export default {
             //    ARR/DAS/SDF,
             //    your computer's serial ID
             match:
-                /`\${\w+\} \/\/ \$\{\w+\}-core \/\/ \$\{\w+\}-GB \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\}`/,
+                /`(\${\w+\}) \/\/ \$\{\w+\}-core \/\/ \$\{\w+\}-GB \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\}`/,
             replace:
-                `\`${userAgent} // 8-core // 0-GB // Intel(R) HD Graphics // $1 // $2 // 1920x1080@1 // $3 // $4 // N/A\``,
+                `$1 // 8-core // 0-GB // Intel(R) HD Graphics // $2 // $3 // 1920x1080@1 // $4 // $5 // N/A\``,
             predicate: () => settings.data.anonymiseFingerprint,
         },
     ],

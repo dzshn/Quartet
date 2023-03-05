@@ -119,7 +119,6 @@ const esbuildOpts: esbuild.BuildOptions = {
         QUARTET_VERSION: JSON.stringify(longVersion),
         QUARTET_DEV: JSON.stringify(watch),
         QUARTET_WEB: "false",
-        QUARTET_USERSCRIPT: "false",
     },
     banner: {
         js: dedent(`\
@@ -260,7 +259,6 @@ async function main() {
             outfile: "dist/Quartet.user.js",
             define: {
                 ...esbuildWebOpts.define,
-                QUARTET_USERSCRIPT: "true",
                 window: "unsafeWindow",
             },
             banner: {
