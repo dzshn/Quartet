@@ -25,6 +25,7 @@ import esbuild from "esbuild";
 import fflate from "fflate";
 import sveltePreprocess from "svelte-preprocess";
 import * as svelte from "svelte/compiler";
+import { Manifest } from "webextension-polyfill";
 
 const zip = promisify(fflate.zip);
 
@@ -133,6 +134,74 @@ const esbuildOpts: esbuild.BuildOptions = {
     },
 };
 
+const webextBuilderPlugin: esbuild.Plugin = {
+    name: "webext-builder",
+    setup(build) {
+        const manifest: Manifest.WebExtensionManifest = {
+            manifest_version: 3,
+            name: "Quartet",
+            description: "A cute and minimal TETR.IO client mod",
+            author: "dzshn",
+            homepage_url: "https://github.com/dzshn/Quartet",
+            icons: { "48": "icon.png" },
+            version,
+            version_name: longVersion,
+            host_permissions: ["*://*.tetr.io/*"],
+            content_scripts: [
+                {
+                    matches: ["*://tetr.io/"],
+                    js: ["content.js"],
+                    run_at: "document_start",
+                },
+            ],
+            web_accessible_resources: [
+                {
+                    resources: ["quartet.js"],
+                    matches: ["*://*.tetr.io/*"],
+                },
+            ],
+        };
+        let content: esbuild.OutputFile;
+        build.onStart(async () => {
+            const { outputFiles, errors, warnings } = await esbuild.build({
+                entryPoints: ["src/browser/content.ts"],
+                write: false,
+                bundle: true,
+                minify,
+            });
+            if (outputFiles)
+                content = outputFiles[0];
+            return { errors, warnings };
+        });
+        build.onEnd(async result => {
+            const fileTree = {
+                "content.js": content.contents,
+                "quartet.js": await readFile("dist/browser.js"),
+                "icon.png": await readFile("docs/icon.png"),
+                "manifest.json": fflate.strToU8(JSON.stringify(manifest, null, 4)),
+            };
+            const sizes = Object.fromEntries(
+                Object.entries(fileTree).map(
+                    ([file, data]) => [file, data.length],
+                ),
+            );
+            await writeFile("dist/extension.zip", await zip(fileTree));
+            if (result.metafile) {
+                result.metafile.outputs["dist/extension (unpacked)"] = {
+                    bytes: Object.values(sizes).reduce((a, b) => a + b),
+                    inputs: Object.fromEntries(
+                        Object.entries(sizes).map(
+                            ([file, length]) => [file, { bytesInOutput: length }],
+                        ),
+                    ),
+                    exports: [],
+                    imports: [],
+                };
+            }
+        });
+    },
+};
+
 function dedent(text: string) {
     const lines = text.split("\n");
     let commonWhitespace = "";
@@ -214,59 +283,7 @@ async function main() {
         const browserCtx = await esbuild.context({
             ...esbuildWebOpts,
             outfile: "dist/browser.js",
-            plugins: [
-                ...esbuildWebOpts.plugins!,
-                {
-                    name: "extension-builder",
-                    setup(build) {
-                        build.onEnd(async () => {
-                            await writeFile(
-                                "dist/extension.zip",
-                                await zip({
-                                    "content.js": (
-                                        await esbuild.build({
-                                            entryPoints: ["src/browser/content.ts"],
-                                            write: false,
-                                            bundle: true,
-                                            minify,
-                                        })
-                                    ).outputFiles[0].contents,
-                                    "quartet.js": await readFile("dist/browser.js"),
-                                    "icon.png": await readFile("docs/icon.png"),
-                                    "manifest.json": fflate.strToU8(JSON.stringify(
-                                        {
-                                            manifest_version: 3,
-                                            name: "Quartet",
-                                            description: "A cute and minimal TETR.IO client mod",
-                                            author: "dzshn",
-                                            homepage_url: "https://github.com/dzshn/Quartet",
-                                            icons: { "48": "icon.png" },
-                                            version,
-                                            version_name: longVersion,
-                                            host_permissions: ["*://*.tetr.io/*"],
-                                            content_scripts: [
-                                                {
-                                                    matches: ["*://tetr.io/"],
-                                                    js: ["content.js"],
-                                                    run_at: "document_start",
-                                                },
-                                            ],
-                                            web_accessible_resources: [
-                                                {
-                                                    resources: ["quartet.js"],
-                                                    matches: ["*://*.tetr.io/*"],
-                                                },
-                                            ],
-                                        },
-                                        null,
-                                        4,
-                                    )),
-                                }),
-                            );
-                        });
-                    },
-                },
-            ],
+            plugins: [...esbuildWebOpts.plugins!, webextBuilderPlugin],
             footer: { js: "//# sourceURL=Quartet" },
         });
 
