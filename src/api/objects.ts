@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import { grabberFor } from "@api/internal";
 import type { BaseTexture } from "pixi.js";
 
@@ -77,23 +76,33 @@ export let Layout: Record<string, {
 }>;
 grabberFor("Layout", v => Layout = v);
 
-export let Assets: Record<string, {
+interface AssetInfo {
     id: string;
     name: string;
+    assets: Record<"hd" | "uhd", {
+        url: string;
+        loaded: boolean;
+        loading: boolean;
+        baseTexture?: BaseTexture;
+        textures: Record<string, unknown>;
+    }>;
     format: "simple" | "connected";
-    assets: Record<
-        string,
-        Record<"hd" | "uhd", {
-            url: string;
-            loaded: boolean;
-            loading: boolean;
-            baseTexture?: BaseTexture;
-            textures: Record<string, unknown>;
-        }>
-    >;
+}
+
+interface MinoAssetInfo extends AssetInfo {
     colors: Record<"base" | "glow", Record<TextureName, number>>;
-}>;
-grabberFor("Assets", v => Assets = v);
+}
+
+interface GhostAssetInfo extends AssetInfo {
+    colorizeGhost: boolean;
+    colorizeX: boolean;
+}
+
+export let MinoAssets: Record<string, MinoAssetInfo>;
+grabberFor("MinoAssets", v => MinoAssets = v);
+
+export let GhostAssets: Record<string, GhostAssetInfo>;
+grabberFor("GhostAssets", v => GhostAssets = v);
 
 export let Loader: {
     /** Adds a callback that will be called once everything is loaded (and after login) */

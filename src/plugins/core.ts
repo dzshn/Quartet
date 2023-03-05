@@ -54,8 +54,12 @@ export default {
             replace: "$1Quartet.Internal.Objects.Menus=$2",
         },
         {
-            match: /(const \w+=)(\{tetrio:\{id:)/,
-            replace: "$1Quartet.Internal.Objects.Assets=$2",
+            match: /(const \w+=)(\{tetrio:\{id:.{10,100}\/minos)/,
+            replace: "$1Quartet.Internal.Objects.MinoAssets=$2",
+        },
+        {
+            match: /,(\w+)=(\{tetrio:\{id:.{10,100}\/ghost)/,
+            replace: ";const $1=Quartet.Internal.Objects.GhostAssets=$2",
         },
         {
             match: /,(\w+)=(\{home:\{starter:)/,
