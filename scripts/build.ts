@@ -232,12 +232,17 @@ async function main() {
                                         })
                                     ).outputFiles[0].contents,
                                     "quartet.js": await readFile("dist/browser.js"),
+                                    "icon.png": await readFile("docs/icon.png"),
                                     "manifest.json": fflate.strToU8(JSON.stringify(
                                         {
                                             manifest_version: 3,
                                             name: "Quartet",
                                             description: "A cute and minimal TETR.IO client mod",
+                                            author: "dzshn",
+                                            homepage_url: "https://github.com/dzshn/Quartet",
+                                            icons: { "48": "icon.png" },
                                             version,
+                                            version_name: longVersion,
                                             host_permissions: ["*://*.tetr.io/*"],
                                             content_scripts: [
                                                 {
