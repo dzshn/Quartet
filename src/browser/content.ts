@@ -16,32 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { anonymousUA } from "@api/constants";
-import { IpcChannel } from "types";
 import browser from "webextension-polyfill";
 
-browser.webRequest.onBeforeSendHeaders.addListener(
-    ({ requestHeaders }) => {
-        const settings = QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS);
-        if (!settings?.Quartet.anonymiseFingerprint)
-            return;
-
-        if (!requestHeaders)
-            return { requestHeaders: [{ name: "User-Agent", value: anonymousUA }] };
-
-        for (const header of requestHeaders)
-            if (header.name.toLowerCase() === "user-agent")
-                header.value = anonymousUA;
-
-        return { requestHeaders };
-    },
-    { urls: ["<all_urls>"] },
-    ["blocking", "requestHeaders"],
-);
-
-browser.tabs.getCurrent().then(tab => {
-    browser.scripting.executeScript({
-        target: { tabId: tab.id! },
-        files: ["quartet.js"],
-    });
-});
+const script = document.createElement("script");
+script.src = browser.runtime.getURL("quartet.js");
+document.documentElement.prepend(script);

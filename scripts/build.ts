@@ -29,9 +29,11 @@ import * as svelte from "svelte/compiler";
 const zip = promisify(fflate.zip);
 
 const watch = process.argv.includes("--watch");
+const minify = !process.argv.includes("--no-minify");
 const web = process.argv.includes("--web");
 const gitHash = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
-const version = `${process.env.npm_package_version}+git.${gitHash}`;
+const version = process.env.npm_package_version!;
+const longVersion = `${version}+git.${gitHash}`;
 
 const license = dedent(`
     /*
@@ -70,7 +72,7 @@ const sveltePreprocessor = sveltePreprocess({
 const esbuildOpts: esbuild.BuildOptions = {
     logLevel: "info",
     metafile: true,
-    minify: true,
+    minify,
     bundle: true,
     platform: "node",
     target: ["chrome83"],
@@ -113,7 +115,7 @@ const esbuildOpts: esbuild.BuildOptions = {
         },
     ],
     define: {
-        QUARTET_VERSION: JSON.stringify(version),
+        QUARTET_VERSION: JSON.stringify(longVersion),
         QUARTET_DEV: JSON.stringify(watch),
         QUARTET_WEB: "false",
         QUARTET_USERSCRIPT: "false",
@@ -125,7 +127,7 @@ const esbuildOpts: esbuild.BuildOptions = {
              *
              * @author dzshn (https://dzshn.xyz)
              * @license GPL-3.0-or-later
-             * @version ${version}
+             * @version ${longVersion}
              */
         `) + license,
     },
@@ -196,7 +198,7 @@ async function main() {
                     name: "Quartet",
                     namespace: "https://github.com/dzshn",
                     description: "A cute and minimal TETR.IO client mod",
-                    version,
+                    version: longVersion,
                     author: "dzshn (https://dzshn.xyz)",
                     license: "GPL-3.0-or-later",
                     donate: "https://ko-fi.com/dzshn",
@@ -218,26 +220,36 @@ async function main() {
                     name: "extension-builder",
                     setup(build) {
                         build.onEnd(async () => {
-                            await esbuild.build({
-                                ...esbuildOpts,
-                                entryPoints: ["src/browser/content.ts"],
-                                outfile: "dist/browser-content.js",
-                            });
                             await writeFile(
                                 "dist/extension.zip",
                                 await zip({
-                                    "content.js": await readFile("dist/browser-content.js"),
-                                    "quartet.js": await readFile("dist/quartet.js"),
+                                    "content.js": (
+                                        await esbuild.build({
+                                            entryPoints: ["src/browser/content.ts"],
+                                            write: false,
+                                            bundle: true,
+                                            minify,
+                                        })
+                                    ).outputFiles[0].contents,
+                                    "quartet.js": await readFile("dist/browser.js"),
                                     "manifest.json": fflate.strToU8(JSON.stringify(
                                         {
                                             manifest_version: 3,
                                             name: "Quartet",
                                             description: "A cute and minimal TETR.IO client mod",
                                             version,
+                                            host_permissions: ["*://*.tetr.io/*"],
                                             content_scripts: [
                                                 {
-                                                    matches: ["*://tetr.io/*"],
+                                                    matches: ["*://tetr.io/"],
                                                     js: ["content.js"],
+                                                    run_at: "document_start",
+                                                },
+                                            ],
+                                            web_accessible_resources: [
+                                                {
+                                                    resources: ["quartet.js"],
+                                                    matches: ["*://*.tetr.io/*"],
                                                 },
                                             ],
                                         },
