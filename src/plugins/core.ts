@@ -85,8 +85,7 @@ export default {
             //    your computer's serial ID
             match:
                 /`(\${\w+\}) \/\/ \$\{\w+\}-core \/\/ \$\{\w+\}-GB \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\} \/\/ (\$\{\w+\}) \/\/ (\$\{\w+\}) \/\/ \$\{\w+\}`/,
-            replace:
-                `$1 // 8-core // 0-GB // Intel(R) HD Graphics // $2 // $3 // 1920x1080@1 // $4 // $5 // N/A\``,
+            replace: "`$1 // 8-core // 0-GB // Intel(R) HD Graphics // $2 // $3 // 1920x1080@1 // $4 // $5 // N/A`",
             predicate: () => settings.data.anonymiseFingerprint,
         },
     ],

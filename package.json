@@ -20,7 +20,7 @@
     "scripts": {
         "lint": "eslint src scripts --ext .js,.ts,.svelte",
         "fix": "eslint --fix",
-        "build": "tsx scripts/build.ts"
+        "build": "tsx scripts/build"
     },
     "private": true,
     "devDependencies": {
