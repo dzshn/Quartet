@@ -15,6 +15,7 @@ specifiers:
   eslint: ^8.32.0
   eslint-plugin-header: ^3.1.1
   eslint-plugin-svelte: ^2.18.0
+  ffeine: github:dzshn/ffeine
   fflate: ^0.7.4
   idb-keyval: ^6.2.0
   pixi.js: ^7.1.1
@@ -40,6 +41,7 @@ devDependencies:
   eslint: 8.32.0
   eslint-plugin-header: 3.1.1_eslint@8.32.0
   eslint-plugin-svelte: 2.18.0_tmo5zkisvhu6htudosk5k7m6pu
+  ffeine: github.com/dzshn/ffeine/09f9361db6c017deb54bca42dc7052171d8497ac
   fflate: 0.7.4
   pixi.js: 7.1.1
   svelte: 3.55.1
@@ -2056,6 +2058,19 @@ packages:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
 
+  /ws/8.12.1:
+    resolution: {integrity: sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: true
+
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
@@ -2075,4 +2090,15 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  github.com/dzshn/ffeine/09f9361db6c017deb54bca42dc7052171d8497ac:
+    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/09f9361db6c017deb54bca42dc7052171d8497ac}
+    name: ffeine
+    version: 0.1.0
+    dependencies:
+      ws: 8.12.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
     dev: true

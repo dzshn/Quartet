@@ -32,6 +32,7 @@
         "eslint": "^8.32.0",
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-svelte": "^2.18.0",
+        "ffeine": "github:dzshn/ffeine",
         "fflate": "^0.7.4",
         "pixi.js": "^7.1.1",
         "svelte": "^3.55.1",

@@ -20,6 +20,7 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
 import esbuild from "esbuild";
+import { Firefox } from "ffeine";
 import fflate from "fflate";
 import sveltePreprocess from "svelte-preprocess";
 import * as svelte from "svelte/compiler";
@@ -83,6 +84,7 @@ export const quartetPlugin: esbuild.Plugin = {
 export const webextBuilderPlugin: esbuild.Plugin = {
     name: "webext-builder",
     setup(build) {
+        const extensionId = "quartet-ff@dzshn.xyz";
         const manifest: Manifest.WebExtensionManifest = {
             manifest_version: 3,
             name: "Quartet",
@@ -106,7 +108,18 @@ export const webextBuilderPlugin: esbuild.Plugin = {
                     matches: ["*://*.tetr.io/*"],
                 },
             ],
+            browser_specific_settings: {
+                gecko: {
+                    id: extensionId,
+                },
+            },
         };
+        // Launches Firefox on a temporary profile and auto-reloads Quartet as
+        // an extension there, if --firefox is provided
+        const browser = process.argv.includes("--firefox")
+            ? new Firefox({ url: "https://tetr.io", logLevel: "info", extensionIds: [extensionId] })
+            : null;
+
         let content: esbuild.OutputFile;
         build.onStart(async () => {
             const { outputFiles, errors, warnings } = await esbuild.build({
@@ -145,6 +158,7 @@ export const webextBuilderPlugin: esbuild.Plugin = {
                     imports: [],
                 };
             }
+            await browser?.installExtension("dist/extension.zip");
         });
     },
 };
