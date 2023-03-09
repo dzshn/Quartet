@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { execSync } from "node:child_process";
+import { execSync } from "child_process";
 
 export const gitHash = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
 export const shortVersion = process.env.npm_package_version!;

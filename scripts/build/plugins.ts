@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { readdir, readFile, writeFile } from "node:fs/promises";
-import { promisify } from "node:util";
+import { readdir, readFile, writeFile } from "fs/promises";
+import { promisify } from "util";
+import { extname } from "path";
 
 import esbuild from "esbuild";
 import { Firefox } from "ffeine";
@@ -67,14 +68,18 @@ export const quartetPlugin: esbuild.Plugin = {
             path: args.path,
         }));
         build.onLoad({ filter: /^~plugins$/, namespace: "all-plugins" }, async () => {
-            let contents = "const p = []; export default p;\n";
-            for (const file of await readdir("./src/plugins")) {
-                const mod = file.replace(/.(js|ts|svelte)$/, "");
-                if (mod === file)
-                    continue;
-                contents += `import ${mod} from "./plugins/${file}"; p.push(${mod});\n`;
+            const plugins: string[] = [];
+            for (const resolveDir of ["./src/plugins", "./src/userplugins"]) {
+                const resolved = await Promise.all(
+                    (await readdir(resolveDir).catch(() => null) ?? [])
+                        .filter(file => [".ts", ""].includes(extname(file)))
+                        .map(file => build.resolve("./" + file, { kind: "import-statement", resolveDir })),
+                );
+                for (const { errors, path } of resolved)
+                    if (!errors.length) plugins.push(path);
             }
-
+            const contents = "const p = []; export default p;"
+                + plugins.map((p, i) => `import p${i} from "${p}"; p.push(p${i});`).join("");
             return { contents, resolveDir: "./src" };
         });
     },
