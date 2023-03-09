@@ -1,0 +1,26 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index af2e0201184cae9986fd2e0fe279f165d1d6ed07..62f90acbf3c9cfdb2751fcdd2b8f198148fb29c3 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -19,7 +19,7 @@ function createStore(dbName, storeName) {
+ let defaultGetStoreFunc;
+ function defaultGetStore() {
+     if (!defaultGetStoreFunc) {
+-        defaultGetStoreFunc = createStore('keyval-store', 'keyval');
++        defaultGetStoreFunc = createStore('QuartetStore', 'Quartet');
+     }
+     return defaultGetStoreFunc;
+ }
+diff --git a/dist/index.js b/dist/index.js
+index 5da144a550f4d2e500b59c8352b1074163189374..93b9f135a97db2a20233b94a6b96ef506ec99d70 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -15,7 +15,7 @@ function createStore(dbName, storeName) {
+ let defaultGetStoreFunc;
+ function defaultGetStore() {
+     if (!defaultGetStoreFunc) {
+-        defaultGetStoreFunc = createStore('keyval-store', 'keyval');
++        defaultGetStoreFunc = createStore('QuartetStore', 'Quartet');
+     }
+     return defaultGetStoreFunc;
+ }

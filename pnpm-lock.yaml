@@ -1,7 +1,13 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  idb-keyval@6.2.0:
+    hash: obvg2pnd5b4befkwhko5couvhu
+    path: patches/idb-keyval@6.2.0.patch
+
 specifiers:
   '@types/eslint': ^8.4.10
+  '@types/webextension-polyfill': ^0.10.0
   '@typescript-eslint/eslint-plugin': ^5.49.0
   '@typescript-eslint/parser': ^5.49.0
   dprint: ^0.34.4
@@ -9,6 +15,9 @@ specifiers:
   eslint: ^8.32.0
   eslint-plugin-header: ^3.1.1
   eslint-plugin-svelte: ^2.18.0
+  ffeine: github:dzshn/ffeine
+  fflate: ^0.7.4
+  idb-keyval: ^6.2.0
   pixi.js: ^7.1.1
   standalone-electron-types: ^1.0.0
   svelte: ^3.55.1
@@ -16,8 +25,11 @@ specifiers:
   systeminformation: ^5.17.8
   tsx: ^3.12.2
   typescript: ^4.9.4
+  webextension-polyfill: ^0.10.0
 
 dependencies:
+  '@types/webextension-polyfill': 0.10.0
+  idb-keyval: 6.2.0_obvg2pnd5b4befkwhko5couvhu
   standalone-electron-types: 1.0.0
 
 devDependencies:
@@ -29,12 +41,15 @@ devDependencies:
   eslint: 8.32.0
   eslint-plugin-header: 3.1.1_eslint@8.32.0
   eslint-plugin-svelte: 2.18.0_tmo5zkisvhu6htudosk5k7m6pu
+  ffeine: github.com/dzshn/ffeine/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2
+  fflate: 0.7.4
   pixi.js: 7.1.1
   svelte: 3.55.1
   svelte-preprocess: 5.0.1_atrrhq7vg4ekua4nnyrpuardle
   systeminformation: 5.17.8
   tsx: 3.12.2
   typescript: 4.9.4
+  webextension-polyfill: 0.10.0
 
 packages:
 
@@ -545,6 +560,10 @@ packages:
   /@types/semver/7.3.13:
     resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==}
     dev: true
+
+  /@types/webextension-polyfill/0.10.0:
+    resolution: {integrity: sha512-If4EcaHzYTqcbNMp/FdReVdRmLL/Te42ivnJII551bYjhX19bWem5m14FERCqdJA732OloGuxCRvLBvcMGsn4A==}
+    dev: false
 
   /@typescript-eslint/eslint-plugin/5.49.0_iu322prlnwsygkcra5kbpy22si:
     resolution: {integrity: sha512-IhxabIpcf++TBaBa1h7jtOWyon80SXPRLDq0dVz5SLFC/eW6tofkw/O7Ar3lkx5z5U6wzbKDrl2larprp5kk5Q==}
@@ -1285,6 +1304,10 @@ packages:
       pend: 1.2.0
     dev: true
 
+  /fflate/0.7.4:
+    resolution: {integrity: sha512-5u2V/CDW15QM1XbbgS+0DfPxVB+jUKhWEKuuFuHncbk3tEEqzmoXL+2KyOFuKGqOnmdIy0/davWF1CkuwtibCw==}
+    dev: true
+
   /file-entry-cache/6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
     engines: {node: ^10.12.0 || >=12.0.0}
@@ -1401,6 +1424,13 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /idb-keyval/6.2.0_obvg2pnd5b4befkwhko5couvhu:
+    resolution: {integrity: sha512-uw+MIyQn2jl3+hroD7hF8J7PUviBU7BPKWw4f/ISf32D4LoGu98yHjrzWWJDASu9QNrX10tCJqk9YY0ClWm8Ng==}
+    dependencies:
+      safari-14-idb-fix: 3.0.0
+    dev: false
+    patched: true
 
   /ignore/5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
@@ -1771,6 +1801,10 @@ packages:
       queue-microtask: 1.2.3
     dev: true
 
+  /safari-14-idb-fix/3.0.0:
+    resolution: {integrity: sha512-eBNFLob4PMq8JA1dGyFn6G97q3/WzNtFK4RnzT1fnLq+9RyrGknzYiM/9B12MnKAxuj1IXr7UKYtTNtjyKMBog==}
+    dev: false
+
   /sander/0.5.1:
     resolution: {integrity: sha512-3lVqBir7WuKDHGrKRDn/1Ye3kwpXaDOMsiRP1wd6wpZW56gJhsbp5RqQpA6JG/P+pkXizygnr1dKR8vzWaVsfA==}
     dependencies:
@@ -2003,6 +2037,10 @@ packages:
       querystring: 0.2.0
     dev: true
 
+  /webextension-polyfill/0.10.0:
+    resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
+    dev: true
+
   /which/2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
@@ -2018,6 +2056,19 @@ packages:
 
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+    dev: true
+
+  /ws/8.12.1:
+    resolution: {integrity: sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
     dev: true
 
   /yallist/4.0.0:
@@ -2039,4 +2090,15 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  github.com/dzshn/ffeine/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2:
+    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2}
+    name: ffeine
+    version: 0.1.0
+    dependencies:
+      ws: 8.12.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
     dev: true

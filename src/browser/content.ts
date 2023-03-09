@@ -16,24 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-type Objects = typeof import("@api/objects");
+type Browser = typeof import("webextension-polyfill");
 
-const setters = {} as Record<keyof Objects, (v: any) => void>;
+const browser: Browser = typeof (globalThis as any).browser === "undefined"
+    ? (globalThis as any).chrome
+    : (globalThis as any).browser;
 
-/**
- * Magic write-only object for use in patches.
- * @see {@link src/plugins/core} for usage.
- */
-export const Objects = new Proxy({}, {
-    get() {
-        throw new Error("Write-only object.");
-    },
-    set: (_, prop: keyof Objects, value) => {
-        setters[prop](value);
-        return true;
-    },
-});
-
-export function grabberFor<K extends keyof Objects>(name: K, callback: (v: Objects[K]) => void) {
-    setters[name] = callback;
-}
+const script = document.createElement("script");
+script.src = browser.runtime.getURL("quartet.js");
+document.documentElement.prepend(script);
