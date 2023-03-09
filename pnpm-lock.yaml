@@ -41,7 +41,7 @@ devDependencies:
   eslint: 8.32.0
   eslint-plugin-header: 3.1.1_eslint@8.32.0
   eslint-plugin-svelte: 2.18.0_tmo5zkisvhu6htudosk5k7m6pu
-  ffeine: github.com/dzshn/ffeine/09f9361db6c017deb54bca42dc7052171d8497ac
+  ffeine: github.com/dzshn/ffeine/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2
   fflate: 0.7.4
   pixi.js: 7.1.1
   svelte: 3.55.1
@@ -2092,8 +2092,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  github.com/dzshn/ffeine/09f9361db6c017deb54bca42dc7052171d8497ac:
-    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/09f9361db6c017deb54bca42dc7052171d8497ac}
+  github.com/dzshn/ffeine/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2:
+    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/1ca9497da4f9b865eb61e787e1fbc9d9490e22b2}
     name: ffeine
     version: 0.1.0
     dependencies:
