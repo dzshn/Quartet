@@ -53,14 +53,37 @@ export interface PluginAuthor {
 export interface Plugin {
     name: string;
     description: string;
+    /**
+     * A list of plugin authors. Usually a property of {@link Devs}.
+     */
     authors: PluginAuthor[];
+    /**
+     * Whether this plugin should be enabled by default.
+     */
+    default?: boolean;
+    /**
+     * If this is set, the plugin may not be turned off.
+     */
     required?: boolean;
+    /**
+     * A settings object as returned by {@link definePluginSettings}.
+     */
+    settings?: DefinedSettings;
+    /**
+     * Code patches this plugin applies to TETR.IO's source code.
+     */
     patches?: Patch[];
+    /**
+     * A list of Svelte components to hook in TETR.IO's DOM.
+     */
     components?: ComponentHook[];
     start?: () => void;
     stop?: () => void;
+    /**
+     * Callback called before TETR.IO's bootstrap is done. This can be used to
+     * run something before the main script is executed.
+     */
     beforeBootstrap?: () => void;
-    settings?: DefinedSettings;
 }
 
 if (!QUARTET_WEB) {
@@ -130,7 +153,6 @@ export function hookComponent<C extends ComponentType>(
 }
 
 function initialiseSettings(plugin: Plugin) {
-    Settings[plugin.name] ??= { enabled: !!plugin.required };
     if (!plugin.settings)
         return;
 

@@ -48,10 +48,10 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
                 if (path === "" && prop in Plugins) {
                     return (target[prop] as any) = makeProxy(
                         {
-                            enabled: Plugins[prop].required || false,
+                            enabled: Plugins[prop].required || Plugins[prop].default || false,
                         },
                         root,
-                        `${prop}`,
+                        prop,
                     );
                 }
 
@@ -81,6 +81,9 @@ export enum SettingType {
 }
 
 type TypeOfSetting<O extends PluginSettingDef> = O extends StringPluginSetting ? string
+    : O extends BooleanPluginSetting ? boolean
+    : O extends SelectPluginSetting ? string
+    : O extends CustomPluginSetting ? any
     : never;
 
 type SettingsData<D extends SettingsDefinition> = {
