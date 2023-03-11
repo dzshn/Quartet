@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { IpcChannel } from "types";
+import { IpcCallback, IpcChannel } from "types";
 
 const quartetChannels = Object.entries(IpcChannel).map(([, v]) => v);
 
@@ -25,9 +25,9 @@ function assertChannelAllowed(channel: IpcChannel) {
         throw new Error(`Illegal IPC channel ${channel}. This incident will be reported.`);
 }
 
-const listeners: Record<IpcChannel, (...args: any[]) => any> = {
+const listeners: { [C in IpcChannel]: IpcCallback<C> } = {
     [IpcChannel.GET_SETTINGS]: () => localStorage.getItem("quartetConfig") ?? "{}",
-    [IpcChannel.SET_SETTINGS]: (data: string) => localStorage.setItem("quartetConfig", data),
+    [IpcChannel.SET_SETTINGS]: data => localStorage.setItem("quartetConfig", data),
     [IpcChannel.GET_PATH]: () => {
         throw new Error("Not available in browsers!");
     },
@@ -35,19 +35,20 @@ const listeners: Record<IpcChannel, (...args: any[]) => any> = {
 
 export const QuartetBeryl = {
     ipc: {
-        on(channel: IpcChannel) {
+        on(channel) {
             assertChannelAllowed(channel);
         },
-        send(channel: IpcChannel, ...args: any[]) {
+        send(channel, ...args) {
             assertChannelAllowed(channel);
             listeners[channel](...args);
         },
-        sendSync(channel: IpcChannel, ...args: any[]): any {
+        sendSync(channel, ...args) {
             assertChannelAllowed(channel);
             return listeners[channel](...args);
         },
-        async invoke(channel: IpcChannel): Promise<any> {
+        async invoke(channel, ...args) {
             assertChannelAllowed(channel);
+            return listeners[channel](...args);
         },
     },
-};
+} as Pick<typeof import("QuartetBeryl").default, "ipc">;

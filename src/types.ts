@@ -16,10 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { IpcRendererEvent } from "electron";
+
 export enum IpcChannel {
     GET_SETTINGS = "QuartetGetSettings",
     SET_SETTINGS = "QuartetSetSettings",
     GET_PATH = "QuartetGetPath",
+}
+
+interface IpcSpec {
+    [IpcChannel.GET_SETTINGS]: () => string;
+    [IpcChannel.SET_SETTINGS]: (settings: string) => void;
+    [IpcChannel.GET_PATH]: (dir: DataDir) => string;
+}
+
+export type IpcArguments<C extends IpcChannel> = Parameters<IpcSpec[C]>;
+export type IpcReturn<C extends IpcChannel> = ReturnType<IpcSpec[C]>;
+export type IpcCallback<C extends IpcChannel> = (...args: IpcArguments<C>) => IpcReturn<C>;
+
+export type IpcRendererListener<T extends any[]> = (event: IpcRendererEvent, ...args: T) => void;
+
+export interface Ipc {
+    on<C extends IpcChannel>(channel: C, listener: IpcRendererListener<IpcArguments<C>>): void;
+    send<C extends IpcChannel>(channel: C, ...args: IpcArguments<C>): void;
+    sendSync<C extends IpcChannel>(channel: C, ...args: IpcArguments<C>): IpcReturn<C>;
+    invoke<C extends IpcChannel>(channel: C, ...args: IpcArguments<C>): Promise<IpcReturn<C>>;
 }
 
 export enum DataDir {

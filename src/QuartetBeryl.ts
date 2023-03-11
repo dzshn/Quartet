@@ -17,15 +17,13 @@
  */
 
 import { Log } from "@api";
-import { ipcRenderer, IpcRendererEvent } from "electron";
+import { ipcRenderer } from "electron";
 import { join } from "path";
-import { IpcChannel } from "types";
+import { Ipc, IpcChannel, IpcRendererListener } from "types";
 
 const { graphics }: typeof import("systeminformation") = require(
     join(process.env.__TETRIO_ASAR!, "node_modules/systeminformation"),
 );
-
-type IpcRendererListener = (event: IpcRendererEvent, ...args: any[]) => void;
 
 const tetrioChannels = [
     "anglecompat",
@@ -51,23 +49,23 @@ function assertChannelAllowed(channel: IpcChannel) {
 const Beryl = {
     refreshRate: 60,
     ipc: {
-        on(channel: IpcChannel, listener: IpcRendererListener) {
+        on(channel, listener) {
             assertChannelAllowed(channel);
-            ipcRenderer.on(channel, listener);
+            ipcRenderer.on(channel, listener as IpcRendererListener<any[]>);
         },
-        send(channel: IpcChannel, ...args: any[]) {
+        send(channel, ...args) {
             assertChannelAllowed(channel);
             ipcRenderer.send(channel, ...args);
         },
-        sendSync(channel: IpcChannel, ...args: any[]): any {
+        sendSync(channel, ...args) {
             assertChannelAllowed(channel);
             return ipcRenderer.sendSync(channel, ...args);
         },
-        invoke(channel: IpcChannel, ...args: any[]): Promise<any> {
+        invoke(channel, ...args) {
             assertChannelAllowed(channel);
             return ipcRenderer.invoke(channel, ...args);
         },
-    },
+    } as Ipc,
     /**
      * Replacement for window.IPC (TETR.IO's preload.js sets it to ipcRenderer)
      *
@@ -75,7 +73,7 @@ const Beryl = {
      */
     _tetrioIpc: {
         // Don't throw, just do nothing
-        on(channel: string, listener: IpcRendererListener) {
+        on(channel: string, listener: IpcRendererListener<any[]>) {
             if (!tetrioChannels.includes(channel))
                 Log.error("Beryl", `unknown channel ${channel} called from unsafe IPC`);
             else

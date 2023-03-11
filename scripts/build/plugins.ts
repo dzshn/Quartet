@@ -17,8 +17,8 @@
  */
 
 import { readdir, readFile, writeFile } from "fs/promises";
-import { promisify } from "util";
 import { extname } from "path";
+import { promisify } from "util";
 
 import esbuild from "esbuild";
 import { Firefox } from "ffeine";

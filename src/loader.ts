@@ -30,6 +30,10 @@ console.log(
         + "  じしf_,)ノ ",
 );
 
+console.log(`[Quartet] On v${QUARTET_VERSION}`);
+for (const p of ["node", "v8", "uv", "electron", "chrome"])
+    console.log(`  ; ${p} ${process.versions[p]}`);
+
 const tetrioAsarPath = join(require.main!.path, "..", "_app.asar");
 
 // @ts-ignore skull emoji

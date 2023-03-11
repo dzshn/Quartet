@@ -27,7 +27,7 @@ const settings = definePluginSettings({
         description: "Most useful on web versions.",
         default: false,
         requiresRestart: true,
-    }
+    },
 });
 
 export default {
@@ -66,5 +66,5 @@ export default {
             replace: "meow?",
             predicate: () => settings.data.adblock,
         },
-    ]
+    ],
 } satisfies Plugin;

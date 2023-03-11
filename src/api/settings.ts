@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Log } from "@api";
 import { Plugins } from "@patcher";
 import { ComponentType } from "svelte";
 import { IpcChannel } from "types";
@@ -29,17 +30,18 @@ export interface Settings {
     };
 }
 
-const settings = (() => {
+function getSettings(): Settings {
     try {
         return JSON.parse(QuartetBeryl.ipc.sendSync(IpcChannel.GET_SETTINGS));
-    } catch {
+    } catch (e) {
+        Log.error("Settings", "Failed to load settings, is it corrupt?", e);
         return {};
     }
-})() as Settings;
+}
 
 const proxyCache: Record<string, any> = {};
 
-function makeProxy<T extends object>(settings: T, root: object = settings, path = ""): T {
+function makeProxy<T extends object>(settings: T, root = settings as Settings, path = ""): T {
     return proxyCache[path] ??= new Proxy(settings, {
         get(target, prop: Extract<keyof T, string>) {
             const value = target[prop];
@@ -65,13 +67,18 @@ function makeProxy<T extends object>(settings: T, root: object = settings, path 
         },
         set(target, prop: Extract<keyof T, string>, value) {
             target[prop] = value;
-            QuartetBeryl.ipc.send(IpcChannel.SET_SETTINGS, JSON.stringify(root, null, 4));
+            QuartetBeryl.ipc.send(
+                IpcChannel.SET_SETTINGS,
+                // Only pretty-print on desktop, because it resides on an actual file
+                // (TETR.IO's electron is slightly ancient and the IPC can only transfer strings)
+                QUARTET_WEB ? JSON.stringify(root) : JSON.stringify(root, null, 4),
+            );
             return true;
         },
     });
 }
 
-export const Settings = makeProxy(settings);
+export const Settings = makeProxy(getSettings());
 
 export enum SettingType {
     STRING,
