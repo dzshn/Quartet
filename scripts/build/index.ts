@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import process from "process";
-
 import esbuild from "esbuild";
 
 import { quartetPlugin, sveltePlugin, webextBuilderPlugin } from "./plugins";
@@ -68,19 +66,19 @@ const desktopTarget: Target = {
         {
             entryPoints: ["src/loader.ts"],
             outfile: "dist/loader.js",
-            footer: { js: "//# sourceURL=QuartetLoader" },
+            footer: { js: "//# sourceURL=null://QuartetLoader" },
         },
         {
             entryPoints: ["src/preload.ts"],
             outfile: "dist/preload.js",
-            footer: { js: "//# sourceURL=QuartetPreload" },
+            footer: { js: "//# sourceURL=null://QuartetPreload" },
         },
         {
             entryPoints: ["src/Quartet.ts"],
             outfile: "dist/quartet.js",
             format: "iife",
             globalName: "Quartet",
-            footer: { js: "//# sourceURL=Quartet" },
+            footer: { js: "//# sourceURL=null://Quartet" },
         },
     ],
 };
@@ -117,13 +115,13 @@ const webTarget: Target = {
                 }) + "\n" + license,
             },
             footer: {
-                js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=Quartet",
+                js: "Object.defineProperty(unsafeWindow,'Quartet',{get:()=>Quartet})\n//# sourceURL=null://Quartet",
             },
         },
         {
             outfile: "dist/browser.js",
             plugins: [webextBuilderPlugin],
-            footer: { js: "//# sourceURL=Quartet" },
+            footer: { js: "//# sourceURL=null://Quartet" },
         },
     ],
 };

@@ -103,7 +103,7 @@ if (!QUARTET_WEB) {
 const originalEval = window.eval;
 window.eval = x => {
     window.eval = originalEval; // only do this once
-    x += "\n//# sourceURL=TETRIO\n";
+    x += "\n//# sourceURL=null://TETRIO\n";
     originalEval.call(undefined, applyPatches(x));
     resolveBootstrap();
 };
