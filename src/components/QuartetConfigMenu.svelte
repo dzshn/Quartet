@@ -128,7 +128,7 @@
         margin-right: 10px;
     }
     .qt-author > img {
-        border-radius: 100%;
+        border-radius: 3px;
     }
 
     .control_group .flex-item {

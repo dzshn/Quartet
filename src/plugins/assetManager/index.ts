@@ -16,11 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * as Api from "@api";
-export * as Internal from "@api/internal";
-export * as Objects from "@api/objects";
-export * as Patcher from "patcher";
+import { Devs } from "@api/constants";
+import { definePluginSettings, SettingType } from "@api/settings";
+import { Plugin } from "patcher";
+import { writable } from "svelte/store";
 
-export { Settings } from "@api/settings";
+import SkinSetting from "./components/SkinSetting.svelte";
 
-export * as IDBKeyVal from "idb-keyval";
+const settings = definePluginSettings({
+    skin: {
+        type: SettingType.CUSTOM,
+        component: SkinSetting,
+    },
+});
+
+export interface Skin {
+    name: string;
+    file: File;
+    url: string;
+}
+
+export const skins = writable([] as Skin[]);
+
+export default {
+    name: "AssetManager",
+    description: "meow",
+    authors: [Devs.dzshn],
+    default: true,
+    settings,
+} satisfies Plugin;
