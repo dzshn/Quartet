@@ -21,7 +21,7 @@ import { extname } from "path";
 import { promisify } from "util";
 
 import esbuild from "esbuild";
-import { Firefox } from "ffeine";
+import { Firefox, FirefoxExtension } from "ffeine";
 import fflate from "fflate";
 import sveltePreprocess from "svelte-preprocess";
 import * as svelte from "svelte/compiler";
@@ -125,6 +125,8 @@ export const webextBuilderPlugin: esbuild.Plugin = {
             ? new Firefox({ url: "https://tetr.io", logLevel: "info", extensionIds: [extensionId] })
             : null;
 
+        let extension: FirefoxExtension | null = null;
+
         let content: esbuild.OutputFile;
         build.onStart(async () => {
             const { outputFiles, errors, warnings } = await esbuild.build({
@@ -163,7 +165,10 @@ export const webextBuilderPlugin: esbuild.Plugin = {
                     imports: [],
                 };
             }
-            await browser?.installExtension("dist/extension.zip");
+            if (browser && extension)
+                await browser.reloadExtension(extension);
+            else if (browser)
+                extension = await browser.installExtension("dist/extension.zip");
         });
     },
 };

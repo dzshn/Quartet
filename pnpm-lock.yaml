@@ -7,6 +7,7 @@ patchedDependencies:
 
 specifiers:
   '@types/eslint': ^8.21.1
+  '@types/node': ^18.15.0
   '@types/webextension-polyfill': ^0.10.0
   '@typescript-eslint/eslint-plugin': ^5.54.1
   '@typescript-eslint/parser': ^5.54.1
@@ -32,6 +33,7 @@ dependencies:
 
 devDependencies:
   '@types/eslint': 8.21.1
+  '@types/node': 18.15.0
   '@types/webextension-polyfill': 0.10.0
   '@typescript-eslint/eslint-plugin': 5.54.1_mlk7dnz565t663n4razh6a6v6i
   '@typescript-eslint/parser': 5.54.1_ycpbpc6yetojsgtrx3mwntkhsu
@@ -40,7 +42,7 @@ devDependencies:
   eslint: 8.35.0
   eslint-plugin-header: 3.1.1_eslint@8.35.0
   eslint-plugin-svelte: 2.21.0_edkhwr7m6j5c643qin6znnpg6e
-  ffeine: github.com/dzshn/ffeine/0825a552248efa4a8fbd7a38baeb370f80e8e086
+  ffeine: github.com/dzshn/ffeine/4f20ea48d3003c36f925a5eebecd83bbc49dc2b9
   fflate: 0.7.4
   pixi.js: 6.1.3
   standalone-electron-types: 1.0.0
@@ -2176,8 +2178,8 @@ packages:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
 
-  /ws/8.12.1:
-    resolution: {integrity: sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==}
+  /ws/8.13.0:
+    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -2210,12 +2212,12 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  github.com/dzshn/ffeine/0825a552248efa4a8fbd7a38baeb370f80e8e086:
-    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/0825a552248efa4a8fbd7a38baeb370f80e8e086}
+  github.com/dzshn/ffeine/4f20ea48d3003c36f925a5eebecd83bbc49dc2b9:
+    resolution: {tarball: https://codeload.github.com/dzshn/ffeine/tar.gz/4f20ea48d3003c36f925a5eebecd83bbc49dc2b9}
     name: ffeine
     version: 0.1.0
     dependencies:
-      ws: 8.12.1
+      ws: 8.13.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
