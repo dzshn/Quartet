@@ -12,7 +12,11 @@
         },
         {
             "files": ["*.svelte", ".eslintrc.*"],
-            "rules": { "header/header": "off" }
+            "rules": {
+                "header/header": "off",
+                "no-self-assign": "off",
+                "no-undef": "off"
+            }
         }
     ],
     "plugins": ["svelte", "@typescript-eslint", "header"],

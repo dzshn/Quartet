@@ -83,7 +83,7 @@ interface AssetInfo {
         url: string;
         loaded: boolean;
         loading: boolean;
-        baseTexture?: BaseTexture;
+        baseTexture: BaseTexture | null;
         textures: Record<string, unknown>;
     }>;
     format: "simple" | "connected";
