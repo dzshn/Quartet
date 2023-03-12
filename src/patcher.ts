@@ -54,7 +54,7 @@ export interface Plugin {
     name: string;
     description: string;
     /**
-     * A list of plugin authors. Usually a property of {@link Devs}.
+     * A list of plugin authors. Usually a property of {@link Devs}
      */
     authors: PluginAuthor[];
     /**
@@ -65,6 +65,10 @@ export interface Plugin {
      * If this is set, the plugin may not be turned off.
      */
     required?: boolean;
+    /**
+     * Restricts this plugin to either web or desktop versions.
+     */
+    target?: "web" | "desktop";
     /**
      * A settings object as returned by {@link definePluginSettings}.
      */

@@ -78,8 +78,10 @@ export const quartetPlugin: esbuild.Plugin = {
                 for (const { errors, path } of resolved)
                     if (!errors.length) plugins.push(path);
             }
-            const contents = "const p = []; export default p;"
-                + plugins.map((p, i) => `import p${i} from "${p}"; p.push(p${i});`).join("");
+            const contents = "const plugins = []; "
+                + 'const add = p => (!p.target || (QUARTET_WEB === (p.target === "web"))) && plugins.push(p);'
+                + "export default plugins;"
+                + plugins.map((p, i) => `import p${i} from "${p}"; add(p${i});`).join("");
             return { contents, resolveDir: "./src" };
         });
     },
