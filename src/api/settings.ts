@@ -17,8 +17,8 @@
  */
 
 import { Log } from "@api";
-import { Plugins } from "@patcher";
-import { ComponentType } from "svelte";
+import { Plugins } from "patcher";
+import { ComponentType, SvelteComponentTyped } from "svelte";
 import { IpcChannel } from "types";
 
 // TODO: bother with ipc and all that (tetr.io also uses localStorage btw)
@@ -90,7 +90,7 @@ export enum SettingType {
 type TypeOfSetting<O extends PluginSettingDef> = O extends StringPluginSetting ? string
     : O extends BooleanPluginSetting ? boolean
     : O extends SelectPluginSetting ? string
-    : O extends CustomPluginSetting ? any
+    : O extends CustomPluginSetting<infer T> ? T
     : never;
 
 type SettingsData<D extends SettingsDefinition> = {
@@ -127,9 +127,13 @@ export interface SelectPluginSetting {
     default?: string;
 }
 
-export interface CustomPluginSetting {
+export interface CustomPluginSetting<T> {
     type: SettingType.CUSTOM;
-    component: ComponentType;
+    component: ComponentType<
+        SvelteComponentTyped<{
+            value?: T;
+        }>
+    >;
 }
 
 export type SettingsDefinition = Record<string, PluginSettingDef>;
@@ -139,10 +143,9 @@ export type PluginSettingDef =
         | StringPluginSetting
         | BooleanPluginSetting
         | SelectPluginSetting
-        | CustomPluginSetting
+        | CustomPluginSetting<any>
     )
     & {
-        title: string;
         requiresRestart?: boolean;
     };
 

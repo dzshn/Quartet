@@ -19,7 +19,7 @@
 import { Devs } from "@api/constants";
 import { Loader, Menus, transitionTo } from "@api/objects";
 import { definePluginSettings, SettingType } from "@api/settings";
-import { Plugin } from "@patcher";
+import { Plugin } from "patcher";
 
 const settings = definePluginSettings({
     immediatelyTransitionTo: {

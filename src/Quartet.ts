@@ -19,6 +19,6 @@
 export * as Api from "@api";
 export * as Internal from "@api/internal";
 export * as Objects from "@api/objects";
-export * as Patcher from "@patcher";
+export * as Patcher from "patcher";
 
 export { Settings } from "@api/settings";

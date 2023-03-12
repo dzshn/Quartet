@@ -38,7 +38,7 @@ export interface ComponentHook {
 
 export interface Patch {
     match: string | RegExp;
-    replace: string;
+    replace: string | ((match: string, ...groups: string[]) => string);
     predicate?: () => boolean;
 }
 
@@ -187,7 +187,7 @@ function applyPatches(src: string): string {
             if (patch.predicate && !patch.predicate())
                 continue;
 
-            const newSrc = src.replace(patch.match, patch.replace);
+            const newSrc = src.replace(patch.match, patch.replace as string /* ??? */);
             if (src === newSrc)
                 Log.warn("Patcher", `Patch for ${plugin.name} had no effect! ${patch.match} -> ${patch.replace}`);
 

@@ -18,7 +18,7 @@
 
 import { Devs } from "@api/constants";
 import { definePluginSettings, SettingType } from "@api/settings";
-import { Plugin } from "@patcher";
+import { Plugin } from "patcher";
 
 const settings = definePluginSettings({
     adblock: {

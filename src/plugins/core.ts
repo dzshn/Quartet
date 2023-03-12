@@ -19,7 +19,7 @@
 import { Devs } from "@api/constants";
 import QuartetConfig from "@components/QuartetConfig.svelte";
 import QuartetConfigMenu from "@components/QuartetConfigMenu.svelte";
-import { Plugin } from "@patcher";
+import { Plugin } from "patcher";
 
 export default {
     name: "Quartet",

@@ -4,9 +4,9 @@
 
     import plugins from "~plugins";
 
-    function notifyRestart(what: string) {
+    function notifyRestart(...what: string[]) {
         showNotification({
-            msg: `${what} requires a restart to fully apply. hit F5 to restart!`,
+            msg: `${what.join(" ")} requires a restart to fully apply. hit F5 to restart!`,
             icon: "warning",
             color: "#fb84bc",
         });
@@ -33,7 +33,7 @@
                 on:click={() => {
                     Settings[plugin.name].enabled = !settings.enabled;
                     if (plugin.patches?.length)
-                        notifyRestart(`${settings.enabled ? "enabling" : "disabling"} ${displayName}`);
+                        notifyRestart(settings.enabled ? "enabling" : "disabling", displayName);
                 }}
                 data-hover="tap"
                 data-hit="click"
@@ -76,7 +76,7 @@
                         class:checked={Settings[plugin.name][key]}
                         title={def.description}
                         on:click={() => Settings[plugin.name][key] = !settings[key]}
-                        on:click={() => def.requiresRestart && notifyRestart(displayName)}
+                        on:click={() => def.requiresRestart && notifyRestart("updating", displayName)}
                         data-hover="tap"
                         data-hit="click"
                     >
@@ -95,7 +95,7 @@
                                 class:pressed={Settings[plugin.name][key] === option.value}
                                 title={option.title}
                                 on:click={() => Settings[plugin.name][key] = option.value}
-                                on:click={() => def.requiresRestart && notifyRestart(displayName)}
+                                on:click={() => def.requiresRestart && notifyRestart("updating", displayName)}
                                 data-hover="tap"
                                 data-hit="click"
                             >
@@ -104,7 +104,9 @@
                         {/each}
                     </div>
                 {:else if def.type === SettingType.CUSTOM}
-                    <svelte:component this={def.component} />
+                    <!-- avoid <svelte:component> as it is reactive -->
+                    {@const Component = def.component}
+                    <Component bind:value={Settings[plugin.name][key]} />
                 {/if}
             {/each}
         </div>

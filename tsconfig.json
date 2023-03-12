@@ -17,7 +17,6 @@
             "@api": ["./api"],
             "@api/*": ["./api/*"],
             "@components/*": ["./components/*"],
-            "@patcher": ["./patcher"],
         }
     }
 }
